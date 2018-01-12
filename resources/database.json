@@ -1,0 +1,22 @@
+{
+	"users": [
+		{
+			"name": "test",
+			"password": "test",
+			"email": "test@its-bank",
+			"money": 1000,
+			"devices": [
+			],
+			"notify": false
+		},
+		{
+			"name": "test2",
+			"password": "test2",
+			"email": "test@its-bank",
+			"money": 1000,
+			"devices": [
+			],
+			"notify": true
+		}
+	]
+}
