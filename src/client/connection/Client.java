@@ -7,6 +7,9 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 import shared.connection.Connection;
+import shared.connection.Message;
+import shared.security.DiffieHellboy;
+import shared.security.Hex;
 
 public class Client {
     private Connection connection;
@@ -32,9 +35,21 @@ public class Client {
     }
 
     public void run() {
+	this.doKeyExchange();
 	while(true) {
 	    this.logger.info("waiting for input...");
 	    String input = this.terminal.nextLine();
 	}
+    }
+
+    private void doKeyExchange() {
+	DiffieHellboy dh = new DiffieHellboy();
+	Hex hex = new Hex("sorrybutthatsnosecret");
+
+	this.logger.info("awaiting key...");
+	Message publicServerKey = this.connection.read();
+	String pServerKey = hex.fromHex(publicServerKey.getData("key"));
+
+	this.logger.info("pkey: " + pServerKey);
     }
 }
