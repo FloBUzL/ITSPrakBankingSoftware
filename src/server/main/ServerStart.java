@@ -1,5 +1,6 @@
 package server.main;
 
+import server.connection.Server;
 import server.data.Database;
 import shared.exception.NotEnoughArgumentsExceptions;
 
@@ -10,8 +11,9 @@ public class ServerStart {
 	}
 
 	String databaseFile = args[0];
-	String port = args[1];
+	int port = Integer.parseInt(args[1]);
 
 	Database db = new Database(databaseFile);
+	new Server(db,port).listen();
     }
 }
