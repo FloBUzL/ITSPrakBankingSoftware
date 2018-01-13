@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import client.worker.ClientBalanceWorker;
 import client.worker.ClientLoginWorker;
+import client.worker.ClientTransactionWorker;
 import shared.connection.Connection;
 import shared.superclassifragilistic.Worker;
 
@@ -56,6 +57,10 @@ public class Client {
 	    		case "b" :
 	    		case "balance" :
 	    		    new ClientBalanceWorker(this.connectionData).setup().run();
+	    		    break;
+	    		case "t" :
+	    		case "transaction" :
+	    		    new ClientTransactionWorker(this.connectionData).setup().run();
 	    		    break;
 	    		default :
 	    		    this.terminal.write("command not supported");

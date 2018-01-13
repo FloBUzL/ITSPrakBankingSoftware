@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import server.data.Database;
 import server.worker.ServerBalanceWorker;
 import server.worker.ServerLoginWorker;
+import server.worker.ServerTransactionWorker;
 import shared.connection.Connection;
 import shared.connection.Message;
 import shared.exception.NoSuchTaskException;
@@ -39,6 +40,8 @@ public class ClientThread extends Thread {
 			case "balance" :
 			    new ServerBalanceWorker(this.connectionData).setup().run();
 			    break;
+			case "transaction" :
+			    new ServerTransactionWorker(this.connectionData).setup().run();
 			case "login" :
 			default :
 			    throw new NoSuchTaskException(input.getData("task"));

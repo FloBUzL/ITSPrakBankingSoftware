@@ -67,4 +67,10 @@ public class Database {
             return sb.toString();
         }
     }
+
+    public String getUserMail(String username) {
+	synchronized (this.users) {
+	    return this.users.get(username).getEmail();
+	}
+    }
 }

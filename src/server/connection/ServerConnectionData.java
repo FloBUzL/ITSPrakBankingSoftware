@@ -10,6 +10,7 @@ public class ServerConnectionData implements ConnectionData {
     private String userName = null;
     private Connection connection = null;
     private AES aes = null;
+    private boolean isAuthenticated = false;
 
     public AES getAes() {
         return aes;
@@ -34,5 +35,11 @@ public class ServerConnectionData implements ConnectionData {
     }
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+    public boolean isAuthenticated() {
+	return this.isAuthenticated;
+    }
+    public void authenticate() {
+	this.isAuthenticated = true;
     }
 }
