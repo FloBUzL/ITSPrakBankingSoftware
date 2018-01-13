@@ -48,4 +48,20 @@ public class Connection {
     public boolean isClosed() {
 	return this.socket.isClosed();
     }
+
+    public void close() {
+	try {
+	    this.in.close();
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	this.out.close();
+	try {
+	    this.socket.close();
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+    }
 }

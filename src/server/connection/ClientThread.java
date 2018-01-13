@@ -5,9 +5,6 @@ import java.util.logging.Logger;
 import server.data.Database;
 import server.worker.ServerLoginWorker;
 import shared.connection.Connection;
-import shared.connection.Message;
-import shared.security.DiffieHellboy;
-import shared.security.Hex;
 
 public class ClientThread extends Thread {
     private Connection connection;
@@ -28,12 +25,18 @@ public class ClientThread extends Thread {
     }
 
     public void run() {
-	new ServerLoginWorker(this.connectionData).setup().run();
+	try {
+	    new ServerLoginWorker(this.connectionData).setup().run();
+	    this.logger.info("started ClientThread");
 
-	this.logger.info("started ClientThread");
-
-	while(!this.connection.isClosed()) {
-	    break;
+	    while(!this.connection.isClosed()) {
+		break;
+	    }
+	} catch (Exception e) {
+	    this.connection.close();
+	    e.printStackTrace();
 	}
+
+
     }
 }

@@ -1,5 +1,7 @@
 package server.worker;
 
+import java.security.NoSuchAlgorithmException;
+
 import server.connection.ServerConnectionData;
 import shared.connection.Message;
 import shared.security.DiffieHellboy;
@@ -22,13 +24,15 @@ public class ServerLoginWorker extends ServerWorker {
     }
 
     @Override
-    public Worker run() {
+    public Worker run() throws Exception {
 	Message publicKeyMessage = new Message();
+	Message publicClientKey;
 	String key;
+	byte[] pClientKey;
+	byte[] sharedSecret;
 
 	this.dh.createKeyPair();
-	key = new String(this.dh.getEncodedPublicKey());
-	key = hex.toHex(key);
+	key = hex.toHex(this.dh.getEncodedPublicKey());
 
 	publicKeyMessage
 		.addData("task", "key_exchange")
@@ -36,7 +40,15 @@ public class ServerLoginWorker extends ServerWorker {
 
 	this.connectionData.getConnection().write(publicKeyMessage);
 
-	this.debug("Sent key " + key);
+	this.debug("Sent key " + new String(this.dh.getEncodedPublicKey()));
+
+	publicClientKey = this.connectionData.getConnection().read();
+	this.debug("received public key from client");
+	pClientKey = hex.fromHex(publicClientKey.getData("key"));
+	this.dh.addPKToKeyAgreement(pClientKey);
+
+	sharedSecret = this.dh.generateSecret();
+	this.debug("ss: " + this.hex.toHex(sharedSecret));
 
 	return this;
     }

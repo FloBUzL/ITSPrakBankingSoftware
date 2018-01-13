@@ -39,10 +39,10 @@ public class Hex {
 		}
 	}
 
-	public String toHex(String input) {
+	public String toHex(byte[] input) {
 		StringBuilder out = new StringBuilder("");
 
-		byte[] bytes = input.getBytes();
+		byte[] bytes = input;
 		byte upper;
 		byte lower;
 		byte mask = 15;
@@ -59,7 +59,7 @@ public class Hex {
 		return out.toString();
 	}
 
-	public String fromHex(String input) {
+	public byte[] fromHex(String input) {
 	    	char[] chars = input.toCharArray();
 		byte[] bytes = new byte[chars.length/2];
 		byte resByte = 0;
@@ -84,6 +84,6 @@ public class Hex {
 			left = !left;
 		}
 
-		return new String(bytes);
+		return bytes;
 	}
 }

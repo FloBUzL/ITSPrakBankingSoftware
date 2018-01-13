@@ -41,10 +41,16 @@ public class Client {
     }
 
     public void run() {
-	new ClientLoginWorker(this.connectionData).setup().run();
-	while(true) {
-	    this.logger.info("waiting for input...");
-	    String input = this.terminal.read();
+	try {
+	    new ClientLoginWorker(this.connectionData).setup().run();
+	    while(true) {
+		this.logger.info("waiting for input...");
+	    	String input = this.terminal.read();
+	    }
+	} catch(Exception e) {
+	    e.printStackTrace();
+	    this.connection.close();
 	}
+
     }
 }

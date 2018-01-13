@@ -10,7 +10,7 @@ public abstract class Worker {
 
     abstract public Worker setup();
 
-    abstract public Worker run();
+    abstract public Worker run() throws Exception;
 
     public boolean isSucceeded() {
 	return this.succeeded;
