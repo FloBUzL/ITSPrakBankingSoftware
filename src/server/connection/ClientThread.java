@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 import server.data.Database;
 import server.worker.ServerLoginWorker;
 import shared.connection.Connection;
+import shared.connection.Message;
+import shared.exception.NoSuchTaskException;
 
 public class ClientThread extends Thread {
     private Connection connection;
@@ -30,7 +32,15 @@ public class ClientThread extends Thread {
 	    this.logger.info("started ClientThread");
 
 	    while(!this.connection.isClosed()) {
-		break;
+		Message input = this.connection.read();
+
+		switch(input.getData("task")) {
+			case "balance" :
+
+			case "login" :
+			default :
+			    throw new NoSuchTaskException(input.getData("task"));
+		}
 	    }
 	} catch (Exception e) {
 	    this.connection.close();
