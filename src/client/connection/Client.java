@@ -3,14 +3,11 @@ package client.connection;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 import client.worker.ClientLoginWorker;
 import shared.connection.Connection;
-import shared.connection.Message;
-import shared.security.DiffieHellboy;
-import shared.security.Hex;
+import shared.superclassifragilistic.Worker;
 
 public class Client {
     private Connection connection;
@@ -44,8 +41,23 @@ public class Client {
 	try {
 	    while(!new ClientLoginWorker(this.connectionData).setup().run().isSucceeded()) {}
 	    while(true) {
-		this.logger.info("waiting for input...");
+		this.terminal.write("waiting for input... [b] balance [t] transmission [e] exit");
 	    	String input = this.terminal.read();
+
+	    	switch(input) {
+	    		case "e" :
+	    		case "exit" :
+	    		case "q" :
+	    		case "quit" :
+	    		    this.terminal.write("closing connection");
+	    		    this.connection.close();
+	    		    return;
+	    		case "b" :
+	    		case "balance" :
+
+	    		default :
+	    		    this.terminal.write("command not supported");
+	    	}
 	    }
 	} catch(Exception e) {
 	    e.printStackTrace();
