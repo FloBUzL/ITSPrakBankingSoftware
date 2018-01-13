@@ -47,5 +47,9 @@ public class Database {
         }
     }
 
+    public boolean checkCR(String user,String nonce,String cr) throws Exception {
+	String sCR = this.users.get(user).createCR(nonce);
 
+	return sCR.equals(cr);
+    }
 }

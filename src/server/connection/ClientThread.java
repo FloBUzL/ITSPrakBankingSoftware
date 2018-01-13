@@ -26,7 +26,7 @@ public class ClientThread extends Thread {
 
     public void run() {
 	try {
-	    new ServerLoginWorker(this.connectionData).setup().run();
+	    while(!new ServerLoginWorker(this.connectionData).setup().run().isSucceeded()) {};
 	    this.logger.info("started ClientThread");
 
 	    while(!this.connection.isClosed()) {

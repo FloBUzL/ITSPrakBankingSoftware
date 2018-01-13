@@ -10,6 +10,8 @@ import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 
+import shared.security.Hash;
+
 public class UserData {
     private String userName;
 
@@ -129,6 +131,10 @@ public class UserData {
     {
         // Compare variables
         return name.equalsIgnoreCase(userName) && password.equals(userPassword);
+    }
+
+    public String createCR(String nonce) throws Exception {
+	return new Hash(this.userName + this.userPassword + nonce).toString();
     }
 
     /**

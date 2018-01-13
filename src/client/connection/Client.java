@@ -42,7 +42,7 @@ public class Client {
 
     public void run() {
 	try {
-	    new ClientLoginWorker(this.connectionData).setup().run();
+	    while(!new ClientLoginWorker(this.connectionData).setup().run().isSucceeded()) {}
 	    while(true) {
 		this.logger.info("waiting for input...");
 	    	String input = this.terminal.read();
