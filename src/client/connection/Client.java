@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
+import client.worker.ClientBalanceWorker;
 import client.worker.ClientLoginWorker;
 import shared.connection.Connection;
 import shared.superclassifragilistic.Worker;
@@ -54,7 +55,8 @@ public class Client {
 	    		    return;
 	    		case "b" :
 	    		case "balance" :
-
+	    		    new ClientBalanceWorker(this.connectionData).setup().run();
+	    		    break;
 	    		default :
 	    		    this.terminal.write("command not supported");
 	    	}

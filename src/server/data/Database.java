@@ -16,10 +16,10 @@ public class Database {
     private String databaseFile;
 
     public Database(String databaseFile) {
-	this.databaseFile = databaseFile;
-	this.users = new HashMap<>();
+        this.databaseFile = databaseFile;
+        this.users = new HashMap<>();
 
-	try(InputStream jsonFileStream = new FileInputStream(this.databaseFile))
+        try(InputStream jsonFileStream = new FileInputStream(this.databaseFile))
         {
             // Retrieve root object
             JsonReader jsonReader = Json.createReader(jsonFileStream);
@@ -28,10 +28,10 @@ public class Database {
             // Read user data
             JsonArray usersArr = rootObj.getJsonArray("users");
             for(JsonObject userDataObj : usersArr.getValuesAs(JsonObject.class)) {
-            	UserData uData = UserData.createFromJSONObject(userDataObj);
-            	String uName = uData.getName();
+                    UserData uData = UserData.createFromJSONObject(userDataObj);
+                    String uName = uData.getName();
 
-            	this.users.put(uName, uData);
+                    this.users.put(uName, uData);
             }
 
             // Release reader resources
@@ -48,8 +48,23 @@ public class Database {
     }
 
     public boolean checkCR(String user,String nonce,String cr) throws Exception {
-	String sCR = this.users.get(user).createCR(nonce);
+        synchronized(this.users) {
+            String sCR = this.users.get(user).createCR(nonce);
 
-	return sCR.equals(cr);
+            return sCR.equals(cr);
+        }
+    }
+
+    public String collectBalance(String username) {
+        synchronized(this.users) {
+            StringBuilder sb = new StringBuilder();
+            UserData curr = this.users.get(username);
+            sb.append("current balance: " + curr.getMoney());
+            curr.getMoneyHistory().forEach((tpl) -> {
+        	sb.append("sent " + tpl.y + " to " + tpl.x);
+            });
+
+            return sb.toString();
+        }
     }
 }

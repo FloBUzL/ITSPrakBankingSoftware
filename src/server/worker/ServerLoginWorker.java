@@ -74,6 +74,7 @@ public class ServerLoginWorker extends ServerWorker {
 	    	.addData("task", "login")
 	    	.addData("message", "Login successful");
 	    this.succeeded = true;
+	    this.connectionData.setUserName(username);
 	} else {
 	    loginResponse
 	    	.addData("task", "login")

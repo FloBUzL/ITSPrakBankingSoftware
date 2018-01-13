@@ -3,6 +3,7 @@ package server.connection;
 import java.util.logging.Logger;
 
 import server.data.Database;
+import server.worker.ServerBalanceWorker;
 import server.worker.ServerLoginWorker;
 import shared.connection.Connection;
 import shared.connection.Message;
@@ -36,7 +37,8 @@ public class ClientThread extends Thread {
 
 		switch(input.getData("task")) {
 			case "balance" :
-
+			    new ServerBalanceWorker(this.connectionData).setup().run();
+			    break;
 			case "login" :
 			default :
 			    throw new NoSuchTaskException(input.getData("task"));

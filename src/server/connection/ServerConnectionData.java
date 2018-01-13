@@ -7,7 +7,7 @@ import shared.superclassifragilistic.ConnectionData;
 
 public class ServerConnectionData implements ConnectionData {
     private Database database = null;
-    private int userId = -1;
+    private String userName = null;
     private Connection connection = null;
     private AES aes = null;
 
@@ -23,11 +23,11 @@ public class ServerConnectionData implements ConnectionData {
     public void setDatabase(Database database) {
         this.database = database;
     }
-    public int getUserId() {
-        return userId;
+    public String getUserName() {
+        return this.userName;
     }
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
     public Connection getConnection() {
         return connection;

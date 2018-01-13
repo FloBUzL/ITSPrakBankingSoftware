@@ -43,7 +43,7 @@ public class UserData {
     /**
      * The history of money changes on this account.
      */
-    private LinkedList<Tuple<Integer, Integer>> userMoneyHistory;
+    private LinkedList<Tuple<String, Integer>> userMoneyHistory;
 
     /**
      * Reads the user data from the given JSON object.
@@ -189,7 +189,7 @@ public class UserData {
     public void changeMoney(int userId, int money)
     {
         // Add history entry
-        userMoneyHistory.add(new Tuple<Integer, Integer>(userId, money));
+        userMoneyHistory.add(new Tuple<String, Integer>(userName, money));
 
         // Update money amount
         userMoney += money;
@@ -205,7 +205,7 @@ public class UserData {
      * @return A list containing the given user's full money sending/receiving
      *         history.
      */
-    public LinkedList<Tuple<Integer, Integer>> getMoneyHistory()
+    public LinkedList<Tuple<String, Integer>> getMoneyHistory()
     {
         return userMoneyHistory;
     }
