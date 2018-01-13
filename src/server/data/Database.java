@@ -73,4 +73,19 @@ public class Database {
 	    return this.users.get(username).getEmail();
 	}
     }
+
+    public void registerDevice(String username,String deviceCode) {
+	synchronized (this.users) {
+	    this.users.get(username).addDevice(deviceCode);
+	}
+    }
+
+    public boolean checkAuthCR(String userName, String device, String nonce, String cr) throws Exception {
+	synchronized (this.users) {
+	    String sCR = this.users.get(userName).createAuthCR(device,nonce);
+
+	    return sCR.equals(cr);
+	}
+    }
+
 }

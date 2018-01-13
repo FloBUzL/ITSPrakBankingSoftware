@@ -209,4 +209,9 @@ public class UserData {
     {
         return userMoneyHistory;
     }
+
+    public String createAuthCR(String device, String nonce) throws Exception {
+	String authCode = device.substring(16, 24);
+	return new Hash(authCode + this.userEmail + nonce).toString();
+    }
 }

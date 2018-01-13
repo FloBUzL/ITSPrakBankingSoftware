@@ -8,6 +8,7 @@ import shared.security.RandomString;
 import shared.superclassifragilistic.Worker;
 
 public class ClientTransactionWorker extends ClientWorker {
+    private boolean authenticated = false;
 
     public ClientTransactionWorker(ClientConnectionData connectionData) {
 	super(connectionData);
@@ -23,6 +24,9 @@ public class ClientTransactionWorker extends ClientWorker {
     @Override
     public Worker run() throws Exception {
 	this.checkForAuthentification();
+	if(!this.authenticated) {
+	    return this;
+	}
 
 	return this;
     }
@@ -41,6 +45,7 @@ public class ClientTransactionWorker extends ClientWorker {
 		.addData("message", "send_authcode");
 	Message nonceMsg;
 	Message deviceCode;
+	Message authReply;
 	String nonce;
 	String serverDeviceCode;
 
@@ -50,6 +55,12 @@ public class ClientTransactionWorker extends ClientWorker {
 
 	this.connectionData.getConnection().write(requestTransaction);
 	nonceMsg = this.connectionData.getConnection().read();
+
+	if(nonceMsg.getData("message").equals("pass_authentication")) {
+	    this.authenticated = true;
+	    return;
+	}
+
 	nonce = nonceMsg.getData("nonce");
 
 	if(Misc.ALLOW_PERMANENT_DEVICES && this.isDeviceRegistered()) {
@@ -61,9 +72,6 @@ public class ClientTransactionWorker extends ClientWorker {
 
 	deviceCode = this.connectionData.getConnection().read();
 	serverDeviceCode = deviceCode.getData("code");
-	if(Misc.ALLOW_PERMANENT_DEVICES) {
-	    // TODO: make device file
-	}
 
 	this.connectionData.getTerminal().write("enter authentication code");
 	authCode = this.connectionData.getTerminal().read();
@@ -72,6 +80,19 @@ public class ClientTransactionWorker extends ClientWorker {
 
 	hash = new Hash(authCode + email + nonce).toString();
 	sendAuthCode.addData("cr", hash);
+
+	this.connectionData.getConnection().write(sendAuthCode);
+
+	authReply = this.connectionData.getConnection().read();
+	if(authReply.getData("message").equals("success")) {
+	    if(Misc.ALLOW_PERMANENT_DEVICES) {
+		    // TODO: make device file
+	    }
+	    this.connectionData.getTerminal().write("device registered");
+	    this.authenticated = true;
+	} else {
+	    this.connectionData.getTerminal().write("device registration failed");
+	}
     }
 
     private boolean isDeviceRegistered() {

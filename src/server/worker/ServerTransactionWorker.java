@@ -39,11 +39,18 @@ public class ServerTransactionWorker extends ServerWorker {
     @Override
     public Worker run() throws Exception {
 	this.checkAuthentication();
+	if(!this.connectionData.isAuthenticated()) {
+	    return this;
+	}
+	this.handleTransaction();s
 	return this;
     }
 
     private void checkAuthentication() throws Exception {
 	if(this.connectionData.isAuthenticated()) {
+	    this.connectionData.getConnection().write(new Message()
+		.addData("task", "transaction")
+		.addData("message", "pass_authentication"));
 	    return;
 	}
 
@@ -55,13 +62,18 @@ public class ServerTransactionWorker extends ServerWorker {
 	Message finishRegistration = new Message()
 		.addData("task", "transaction")
 		.addData("message", "finish_registration");
+	Message authCodeAnswer = new Message()
+		.addData("task", "transaction");
 	boolean registered = false;
 	boolean authenticated = false;
+	boolean loop = true;
 	Message clientRequest;
+	Message crCode;
+	String cr;
 
 	this.connectionData.getConnection().write(askForAuthentication);
 
-	while(true) {
+	while(loop) {
 	    clientRequest = this.connectionData.getConnection().read();
 	    switch(clientRequest.getData("message")) {
 	    	case "register_device" :
@@ -72,16 +84,32 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    String serverCodeFirstPart = new RandomString(8).toString();
 	    	    String serverCodeSecondPart = new RandomString(8).toString();
 
+	    	    this.debug("new device registered - authcode: " + serverCodeFirstPart);
 	    	    this.sendMail(this.connectionData.getDatabase().getUserMail(this.connectionData.getUserName()), serverCodeFirstPart);
 
 	    	    finishRegistration.addData("code", serverCodeFirstPart + serverCodeSecondPart);
+	    	    this.connectionData.getDatabase().registerDevice(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart);
 
 	    	    this.connectionData.getConnection().write(finishRegistration);
+	    	    crCode = this.connectionData.getConnection().read();
+	    	    cr = crCode.getData("cr");
+	    	    if(this.connectionData.getDatabase().checkAuthCR(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart,nonce,cr)) {
+	    		this.connectionData.authenticate();
+	    		authCodeAnswer.addData("message", "success");
+	    	    } else {
+	    		authCodeAnswer.addData("message", "failed");
+	    	    }
+	    	    this.connectionData.getConnection().write(authCodeAnswer);
+	    	    loop = false;
 	    	break;
 	    	default :
 	    	    throw new AuthenticationException();
 	    }
 	}
+    }
+
+    private void handleTransaction() throws Exception {
+
     }
 
     private void sendMail(String email,String authcode) {
