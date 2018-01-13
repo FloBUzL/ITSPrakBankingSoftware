@@ -186,7 +186,7 @@ public class UserData {
      *            value) from this user. This function simply does an addition, the
      *            checks must be done by the caller!
      */
-    public void changeMoney(int userId, int money)
+    public void changeMoney(String userName, int money)
     {
         // Add history entry
         userMoneyHistory.add(new Tuple<String, Integer>(userName, money));

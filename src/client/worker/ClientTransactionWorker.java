@@ -27,6 +27,7 @@ public class ClientTransactionWorker extends ClientWorker {
 	if(!this.authenticated) {
 	    return this;
 	}
+	this.handleTransaction();
 
 	return this;
     }
@@ -92,6 +93,36 @@ public class ClientTransactionWorker extends ClientWorker {
 	    this.authenticated = true;
 	} else {
 	    this.connectionData.getTerminal().write("device registration failed");
+	}
+    }
+
+    private void handleTransaction() throws Exception {
+	String receiver;
+	String amount;
+	Message sendTransaction = new Message()
+		.addData("task", "transaction")
+		.addData("message", "do_transaction");
+	Message response;
+
+	this.connectionData.getTerminal().write("enter receiver");
+	receiver = this.connectionData.getTerminal().read();
+
+	do {
+	    this.connectionData.getTerminal().write("enter amount (1-10)");
+	    amount = this.connectionData.getTerminal().read();
+	} while(!amount.matches("[0-9]|10"));
+
+	sendTransaction
+		.addData("receiver", this.connectionData.getAes().encode(receiver))
+		.addData("amount", this.connectionData.getAes().encode(amount));
+
+	this.connectionData.getConnection().write(sendTransaction);
+
+	response = this.connectionData.getConnection().read();
+	if(response.getData("message").equals("success")) {
+	    this.connectionData.getTerminal().write("transaction done");
+	} else {
+	    this.connectionData.getTerminal().write("transaction failed. entered correct username?");
 	}
     }
 

@@ -4,6 +4,7 @@ import server.connection.ServerConnectionData;
 import shared.connection.Message;
 import shared.constants.Misc;
 import shared.exception.AuthenticationException;
+import shared.exception.GeneralException;
 import shared.exception.NoSuchTaskException;
 import shared.security.RandomString;
 import shared.superclassifragilistic.Worker;
@@ -40,9 +41,13 @@ public class ServerTransactionWorker extends ServerWorker {
     public Worker run() throws Exception {
 	this.checkAuthentication();
 	if(!this.connectionData.isAuthenticated()) {
+	    this.debug("not authenticated");
 	    return this;
 	}
-	this.handleTransaction();s
+	this.debug("authenticated");
+	this.handleTransaction();
+	this.succeeded = true;
+
 	return this;
     }
 
@@ -109,7 +114,28 @@ public class ServerTransactionWorker extends ServerWorker {
     }
 
     private void handleTransaction() throws Exception {
+	Message transaction;
+	String receiver;
+	String amount;
+	Message transactionResponse = new Message()
+		.addData("task", "transaction");
 
+	transaction = this.connectionData.getConnection().read();
+	receiver = this.connectionData.getAes().decode(transaction.getData("receiver"));
+	amount = this.connectionData.getAes().decode(transaction.getData("amount"));
+	if(!amount.matches("[0-9]|10")) {
+	    throw new GeneralException();
+	}
+
+	this.debug("executing transaction...");
+
+	if(this.connectionData.getDatabase().doTransaction(this.connectionData.getUserName(),receiver,Integer.parseInt(amount))) {
+	    transactionResponse.addData("message", "success");
+	} else {
+	    transactionResponse.addData("message", "error");
+	}
+
+	this.connectionData.getConnection().write(transactionResponse);
     }
 
     private void sendMail(String email,String authcode) {

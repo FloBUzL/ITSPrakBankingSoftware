@@ -43,7 +43,7 @@ public class Client {
 	try {
 	    while(!new ClientLoginWorker(this.connectionData).setup().run().isSucceeded()) {}
 	    while(true) {
-		this.terminal.write("waiting for input... [b] balance [t] transmission [e] exit");
+		this.terminal.write("waiting for input... [b] balance [t] transaction [e] exit");
 	    	String input = this.terminal.read();
 
 	    	switch(input) {

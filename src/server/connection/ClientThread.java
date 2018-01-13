@@ -42,6 +42,7 @@ public class ClientThread extends Thread {
 			    break;
 			case "transaction" :
 			    new ServerTransactionWorker(this.connectionData).setup().run();
+			    break;
 			case "login" :
 			default :
 			    throw new NoSuchTaskException(input.getData("task"));

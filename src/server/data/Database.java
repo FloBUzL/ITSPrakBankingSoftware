@@ -61,7 +61,11 @@ public class Database {
             UserData curr = this.users.get(username);
             sb.append("current balance: " + curr.getMoney());
             curr.getMoneyHistory().forEach((tpl) -> {
-        	sb.append("sent " + tpl.y + " to " + tpl.x);
+        	if(tpl.y < 0) {
+        	    sb.append("\n" + "sent " + ((-1) * tpl.y) + " to " + tpl.x);
+        	} else {
+        	    sb.append("\n" + "received " + tpl.y + " from " + tpl.x);
+        	}
             });
 
             return sb.toString();
@@ -85,6 +89,19 @@ public class Database {
 	    String sCR = this.users.get(userName).createAuthCR(device,nonce);
 
 	    return sCR.equals(cr);
+	}
+    }
+
+    public boolean doTransaction(String userName, String receiver, int amount) {
+	synchronized (this.users) {
+	    if(!this.users.containsKey(receiver) || this.users.get(userName).getMoney() < amount) {
+		return false;
+	    }
+
+	    this.users.get(userName).changeMoney(receiver, -amount);
+	    this.users.get(receiver).changeMoney(userName, amount);
+
+	    return true;
 	}
     }
 
