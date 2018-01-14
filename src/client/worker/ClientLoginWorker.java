@@ -89,6 +89,8 @@ public class ClientLoginWorker extends ClientWorker {
 	    this.connectionData.getTerminal().write("Login failed. Try again.");
 	} else {
 	    this.connectionData.getTerminal().write("Login successful");
+	    this.connectionData.setUsername(username);
+	    this.debug("set username: " + username);
 	    this.succeeded = true;
 	}
 

@@ -92,7 +92,6 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    this.debug("new device registered - authcode: " + serverCodeFirstPart);
 	    	    this.sendMail(this.connectionData.getDatabase().getUserMail(this.connectionData.getUserName()), serverCodeFirstPart);
 
-	    	    finishRegistration.addData("code", serverCodeFirstPart + serverCodeSecondPart);
 	    	    this.connectionData.getDatabase().registerDevice(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart);
 
 	    	    this.connectionData.getConnection().write(finishRegistration);
@@ -101,8 +100,10 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    if(this.connectionData.getDatabase().checkAuthCR(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart,nonce,cr)) {
 	    		this.connectionData.authenticate();
 	    		authCodeAnswer.addData("message", "success");
+	    		authCodeAnswer.addData("code", serverCodeFirstPart + serverCodeSecondPart);
 	    	    } else {
 	    		authCodeAnswer.addData("message", "failed");
+	    		this.connectionData.getDatabase().deleteDevice(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart);
 	    		this.connectionData.getAuthErrors().increase(this.connectionData.getConnection().getIP(), this.connectionData.getUserName());
 	    	    }
 	    	    this.connectionData.getConnection().write(authCodeAnswer);

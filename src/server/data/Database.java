@@ -87,6 +87,12 @@ public class Database {
 	}
     }
 
+    public void deleteDevice(String username, String deviceCode) {
+	synchronized (this.users) {
+	    this.users.get(username).removeDevice(deviceCode);
+	}
+    }
+
     public boolean checkAuthCR(String userName, String device, String nonce, String cr) throws Exception {
 	synchronized (this.users) {
 	    String sCR = this.users.get(userName).createAuthCR(device,nonce);

@@ -149,6 +149,10 @@ public class UserData {
         userDeviceAuthenticationStrings.add(deviceCode);
     }
 
+    public void removeDevice(String deviceCode) {
+	this.userDeviceAuthenticationStrings.remove(deviceCode);
+    }
+
     /**
      * Checks whether this user has a device with the given code.
      *

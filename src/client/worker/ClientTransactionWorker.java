@@ -1,5 +1,7 @@
 package client.worker;
 
+import java.io.PrintWriter;
+
 import client.connection.ClientConnectionData;
 import shared.connection.Message;
 import shared.constants.Misc;
@@ -72,7 +74,7 @@ public class ClientTransactionWorker extends ClientWorker {
 	this.connectionData.getConnection().write(registerDevice);
 
 	deviceCode = this.connectionData.getConnection().read();
-	serverDeviceCode = deviceCode.getData("code");
+
 
 	this.connectionData.getTerminal().write("enter authentication code");
 	authCode = this.connectionData.getTerminal().read();
@@ -86,8 +88,9 @@ public class ClientTransactionWorker extends ClientWorker {
 
 	authReply = this.connectionData.getConnection().read();
 	if(authReply.getData("message").equals("success")) {
+	    serverDeviceCode = authReply.getData("code");
 	    if(Misc.ALLOW_PERMANENT_DEVICES) {
-		    // TODO: make device file
+		this.writeDeviceFile(clientDeviceCode + serverDeviceCode);
 	    }
 	    this.connectionData.getTerminal().write("device registered");
 	    this.authenticated = true;
@@ -123,6 +126,17 @@ public class ClientTransactionWorker extends ClientWorker {
 	    this.connectionData.getTerminal().write("transaction done");
 	} else {
 	    this.connectionData.getTerminal().write("transaction failed. entered correct username?");
+	}
+    }
+
+    private void writeDeviceFile(String deviceCode) {
+	try {
+	    this.debug("get username: " + this.connectionData.getUsername());
+	    PrintWriter file = new PrintWriter("resources/device_" + this.connectionData.getUsername());
+	    file.write(deviceCode);
+	    file.close();
+	} catch(Exception e) {
+
 	}
     }
 
