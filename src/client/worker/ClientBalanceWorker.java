@@ -4,20 +4,31 @@ import client.connection.ClientConnectionData;
 import shared.connection.Message;
 import shared.superclassifragilistic.Worker;
 
+/**
+ * the worker used for retrieving the user's balance
+ * @author Florian
+ */
 public class ClientBalanceWorker extends ClientWorker {
-
+    /**
+     * the constructor for the worker
+     * @param connectionData the connection's data object
+     */
     public ClientBalanceWorker(ClientConnectionData connectionData) {
 	super(connectionData);
-	// TODO Auto-generated constructor stub
     }
 
     @Override
+    /**
+     * doesn't do anything yet
+     */
     public Worker setup() {
-	// TODO Auto-generated method stub
 	return this;
     }
 
     @Override
+    /**
+     * starts the worker
+     */
     public Worker run() throws Exception {
 	this.sendBalanceRequest();
 	this.receiveAndPrintBalance();
@@ -34,6 +45,7 @@ public class ClientBalanceWorker extends ClientWorker {
 
     private void receiveAndPrintBalance() throws Exception {
 	Message balance = this.connectionData.getConnection().read();
+	// receive and print encrypted balance
 	String toPrint = this.connectionData.getAes().decode(balance.getData("balance"));
 	this.connectionData.getTerminal().write(toPrint);
     }
