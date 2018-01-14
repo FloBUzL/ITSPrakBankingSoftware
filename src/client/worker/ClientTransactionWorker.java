@@ -1,6 +1,12 @@
 package client.worker;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 
 import client.connection.ClientConnectionData;
 import shared.connection.Message;
@@ -8,6 +14,8 @@ import shared.constants.Misc;
 import shared.security.Hash;
 import shared.security.RandomString;
 import shared.superclassifragilistic.Worker;
+import sun.misc.IOUtils;
+import sun.nio.ch.IOUtil;
 
 public class ClientTransactionWorker extends ClientWorker {
     private boolean authenticated = false;
@@ -66,9 +74,11 @@ public class ClientTransactionWorker extends ClientWorker {
 
 	nonce = nonceMsg.getData("nonce");
 
-	if(Misc.ALLOW_PERMANENT_DEVICES && this.isDeviceRegistered()) {
-	    // TODO: authenticate device
-	    // TODO: return
+	if(Misc.ALLOW_PERMANENT_DEVICES) {
+	    this.authenticated = this.autoAuthenticateDevice(nonce);
+	    if(this.authenticated == true) {
+		return;
+	    }
 	}
 
 	this.connectionData.getConnection().write(registerDevice);
@@ -97,6 +107,42 @@ public class ClientTransactionWorker extends ClientWorker {
 	} else {
 	    this.connectionData.getTerminal().write("device registration failed");
 	}
+    }
+
+    private boolean autoAuthenticateDevice(String nonce) {
+	String devCode = "";
+	String email = "";
+	String authCode = "";
+	String cr = "";
+	Message autoAuthenticate = new Message()
+		.addData("task", "transaction")
+		.addData("message", "authenticate_device");
+	Message reply;
+
+	try {
+	    File device = new File("resources/device_" + this.connectionData.getUsername());
+	    if(!device.exists()) {
+		return false;
+	    }
+	    BufferedReader br = new BufferedReader(new FileReader(device));
+	    devCode = br.readLine();
+	    authCode = devCode.substring(16,24);
+
+	    this.connectionData.getTerminal().write("enter your email adress for authentication");
+	    email = this.connectionData.getTerminal().read();
+	    cr = new Hash(authCode + email + nonce).toString();
+	    autoAuthenticate.addData("device", devCode);
+	    autoAuthenticate.addData("cr", cr);
+	    this.connectionData.getConnection().write(autoAuthenticate);
+	    reply = this.connectionData.getConnection().read();
+	    if(reply.getData("message").equals("failed")) {
+		return false;
+	    }
+	} catch (Exception e) {
+	    return false;
+	}
+
+	return true;
     }
 
     private void handleTransaction() throws Exception {
@@ -138,10 +184,5 @@ public class ClientTransactionWorker extends ClientWorker {
 	} catch(Exception e) {
 
 	}
-    }
-
-    private boolean isDeviceRegistered() {
-	// TODO: check for registered device
-	return false;
     }
 }

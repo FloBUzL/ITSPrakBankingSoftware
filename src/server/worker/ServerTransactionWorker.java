@@ -81,6 +81,21 @@ public class ServerTransactionWorker extends ServerWorker {
 	while(loop) {
 	    clientRequest = this.connectionData.getConnection().read();
 	    switch(clientRequest.getData("message")) {
+	    	case "authenticate_device" :
+	    	    String clientCR = clientRequest.getData("cr");
+	    	    String deviceCode = clientRequest.getData("device");
+	    	    Message authReply = new Message()
+	    		    .addData("task", "transaction");
+
+	    	    if(this.connectionData.getDatabase().checkAuthCR(this.connectionData.getUserName(), deviceCode, nonce, clientCR)) {
+	    		loop = false;
+	    		this.connectionData.authenticate();
+	    		authReply.addData("message", "success");
+	    	    } else {
+	    		authReply.addData("message", "failed");
+	    	    }
+	    	    this.connectionData.getConnection().write(authReply);
+	    	break;
 	    	case "register_device" :
 	    	    String clientCode = clientRequest.getData("code");
 	    	    if(clientCode.length() != 16) {

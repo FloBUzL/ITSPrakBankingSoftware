@@ -11,6 +11,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
+import shared.constants.Misc;
+
 public class Database {
     private HashMap<String,UserData> users;
     private String databaseFile;
@@ -95,7 +97,13 @@ public class Database {
 
     public boolean checkAuthCR(String userName, String device, String nonce, String cr) throws Exception {
 	synchronized (this.users) {
+	    if(!Misc.ALLOW_PERMANENT_DEVICES) {
+		return false;
+	    }
 	    String sCR = this.users.get(userName).createAuthCR(device,nonce);
+	    if(sCR == null) {
+		return false;
+	    }
 
 	    return sCR.equals(cr);
 	}

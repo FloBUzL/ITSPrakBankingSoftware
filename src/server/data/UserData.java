@@ -215,6 +215,9 @@ public class UserData {
     }
 
     public String createAuthCR(String device, String nonce) throws Exception {
+	if(this.hasDevice(device)) {
+	    return null;
+	}
 	String authCode = device.substring(16, 24);
 	return new Hash(authCode + this.userEmail + nonce).toString();
     }
