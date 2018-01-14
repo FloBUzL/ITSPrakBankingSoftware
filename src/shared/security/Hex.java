@@ -4,11 +4,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+/**
+ * used for turning a byte array to a hex string and vice versa
+ * @author Florian
+ */
 public class Hex {
 	private Random rand;
 	private char[] charTable;
 	public static final String charList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890-!+";
 
+	/**
+	 * constructor
+	 * @param init string used for creating the random's seed
+	 */
 	public Hex(String init) {
 		this.setUpRandom(init);
 		this.setUpCharTable();
@@ -39,6 +47,11 @@ public class Hex {
 		}
 	}
 
+	/**
+	 * converts byte array to hex string
+	 * @param input the byte array
+	 * @return the hex string
+	 */
 	public String toHex(byte[] input) {
 		StringBuilder out = new StringBuilder("");
 
@@ -59,6 +72,11 @@ public class Hex {
 		return out.toString();
 	}
 
+	/**
+	 * converts hex string to byte array
+	 * @param input the hex string
+	 * @return the byte array
+	 */
 	public byte[] fromHex(String input) {
 	    	char[] chars = input.toCharArray();
 		byte[] bytes = new byte[chars.length/2];

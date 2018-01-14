@@ -1,24 +1,30 @@
 package shared.superclassifragilistic;
 
-import java.util.logging.Logger;
-
-import shared.constants.Misc;
-
+/**
+ * abstract worker class
+ * @author Florian Berberich
+ */
 public abstract class Worker {
     protected boolean succeeded = false;
-    private Logger logger = Logger.getAnonymousLogger();
 
+    /**
+     * should setup all needed objects
+     * @return the object itself
+     */
     abstract public Worker setup();
 
+    /**
+     * runs the server
+     * @return the object itself
+     * @throws Exception
+     */
     abstract public Worker run() throws Exception;
 
+    /**
+     * returns if the worker succeeded
+     * @return
+     */
     public boolean isSucceeded() {
 	return this.succeeded;
-    }
-
-    protected void debug(String message) {
-	if(Misc.DEBUG) {
-	    this.logger.info(message);
-	}
     }
 }

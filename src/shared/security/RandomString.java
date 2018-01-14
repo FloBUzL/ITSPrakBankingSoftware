@@ -2,9 +2,17 @@ package shared.security;
 
 import java.util.Random;
 
+/**
+ * creates a random string
+ * @author Florian
+ */
 public class RandomString {
     private String randString = null;
 
+    /**
+     * creates a random string with the given length
+     * @param stringLength the given length
+     */
     public RandomString(int stringLength) {
 	Random rand = new Random();
 	char[] chars = Hex.charList.toCharArray();
@@ -17,6 +25,9 @@ public class RandomString {
 	this.randString = sb.toString();
     }
 
+    /**
+     * getter for the string
+     */
     public String toString() {
 	return this.randString;
     }
