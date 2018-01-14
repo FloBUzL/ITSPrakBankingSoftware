@@ -1,5 +1,6 @@
 package server.connection;
 
+import server.data.AuthenticationErrors;
 import server.data.Database;
 import shared.connection.Connection;
 import shared.security.AES;
@@ -11,7 +12,11 @@ public class ServerConnectionData implements ConnectionData {
     private Connection connection = null;
     private AES aes = null;
     private boolean isAuthenticated = false;
+    private AuthenticationErrors authErrors = null;
 
+    public AuthenticationErrors getAuthErrors() {
+        return authErrors;
+    }
     public AES getAes() {
         return aes;
     }
@@ -41,5 +46,8 @@ public class ServerConnectionData implements ConnectionData {
     }
     public void authenticate() {
 	this.isAuthenticated = true;
+    }
+    public void setAuthErrors(AuthenticationErrors authErrors) {
+	this.authErrors = authErrors;
     }
 }

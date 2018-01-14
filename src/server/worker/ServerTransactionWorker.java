@@ -103,6 +103,7 @@ public class ServerTransactionWorker extends ServerWorker {
 	    		authCodeAnswer.addData("message", "success");
 	    	    } else {
 	    		authCodeAnswer.addData("message", "failed");
+	    		this.connectionData.getAuthErrors().increase(this.connectionData.getConnection().getIP(), this.connectionData.getUserName());
 	    	    }
 	    	    this.connectionData.getConnection().write(authCodeAnswer);
 	    	    loop = false;

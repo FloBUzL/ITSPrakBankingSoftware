@@ -2,12 +2,14 @@ package server.connection;
 
 import java.util.logging.Logger;
 
+import server.data.AuthenticationErrors;
 import server.data.Database;
 import server.worker.ServerBalanceWorker;
 import server.worker.ServerLoginWorker;
 import server.worker.ServerTransactionWorker;
 import shared.connection.Connection;
 import shared.connection.Message;
+import shared.exception.AuthenticationException;
 import shared.exception.NoSuchTaskException;
 
 public class ClientThread extends Thread {
@@ -16,7 +18,7 @@ public class ClientThread extends Thread {
     private Logger logger;
     private ServerConnectionData connectionData;
 
-    public ClientThread(Connection connection, Database data) {
+    public ClientThread(Connection connection, Database data, AuthenticationErrors authErrors) {
 	this.connectionData = new ServerConnectionData();
 	this.connection = connection;
 	this.data = data;
@@ -24,6 +26,7 @@ public class ClientThread extends Thread {
 
 	this.connectionData.setConnection(connection);
 	this.connectionData.setDatabase(data);
+	this.connectionData.setAuthErrors(authErrors);
 
 	this.logger.info("ClientThread created");
     }
@@ -34,6 +37,9 @@ public class ClientThread extends Thread {
 	    this.logger.info("started ClientThread");
 
 	    while(!this.connection.isClosed()) {
+		if(this.connectionData.getAuthErrors().isUserBlocked(this.connectionData.getUserName()) || this.connectionData.getAuthErrors().isHostBlocked(this.connectionData.getConnection().getIP())) {
+		    throw new AuthenticationException();
+		}
 		Message input = this.connection.read();
 
 		switch(input.getData("task")) {

@@ -67,7 +67,7 @@ public class Client {
 	    	}
 	    }
 	} catch(Exception e) {
-	    e.printStackTrace();
+	    this.terminal.write("Something went wrong, sorry.");
 	    this.connection.close();
 	}
 

@@ -2,6 +2,7 @@ package server.worker;
 
 import server.connection.ServerConnectionData;
 import shared.connection.Message;
+import shared.exception.AuthenticationException;
 import shared.security.AES;
 import shared.security.DiffieHellboy;
 import shared.security.Hex;
@@ -67,6 +68,10 @@ public class ServerLoginWorker extends ServerWorker {
 	clientCR = this.connectionData.getAes().decode(loginMessage.getData("cr"));
 	username = loginMessage.getData("user");
 
+	if(this.connectionData.getAuthErrors().isUserBlocked(username) || this.connectionData.getAuthErrors().isHostBlocked(this.connectionData.getConnection().getIP())) {
+	    throw new AuthenticationException();
+	}
+
 	this.debug("got cr: " + clientCR);
 
 	if(this.connectionData.getDatabase().checkCR(username, nonce, clientCR)) {
@@ -79,6 +84,7 @@ public class ServerLoginWorker extends ServerWorker {
 	    loginResponse
 	    	.addData("task", "login")
 	    	.addData("message", "Login failed");
+	    this.connectionData.getAuthErrors().increase(this.connectionData.getConnection().getIP(), username);
 	}
 
 	this.connectionData.getConnection().write(loginResponse);

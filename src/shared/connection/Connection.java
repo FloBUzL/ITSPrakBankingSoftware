@@ -45,6 +45,10 @@ public class Connection {
 	this.out.flush();
     }
 
+    public String getIP() {
+	return this.socket.getInetAddress().toString();
+    }
+
     public boolean isClosed() {
 	return this.socket.isClosed();
     }
