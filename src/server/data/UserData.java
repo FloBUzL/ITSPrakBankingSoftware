@@ -133,6 +133,12 @@ public class UserData {
         return name.equalsIgnoreCase(userName) && password.equals(userPassword);
     }
 
+    /**
+     * create's a cr
+     * @param nonce the nonce to use
+     * @return the cr created
+     * @throws Exception
+     */
     public String createCR(String nonce) throws Exception {
 	return new Hash(this.userName + this.userPassword + nonce).toString();
     }
@@ -149,6 +155,10 @@ public class UserData {
         userDeviceAuthenticationStrings.add(deviceCode);
     }
 
+    /**
+     * deletes a device with given code
+     * @param deviceCode the device's code
+     */
     public void removeDevice(String deviceCode) {
 	this.userDeviceAuthenticationStrings.remove(deviceCode);
     }
@@ -214,6 +224,13 @@ public class UserData {
         return userMoneyHistory;
     }
 
+    /**
+     * creates a cr
+     * @param device the device's code
+     * @param nonce the nonce to use
+     * @return the cr
+     * @throws Exception
+     */
     public String createAuthCR(String device, String nonce) throws Exception {
 	if(!this.hasDevice(device)) {
 	    return null;

@@ -12,12 +12,22 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import shared.constants.Misc;
+import shared.exception.GeneralException;
 
+/**
+ * wrapper object for communication to UserData
+ * @author Florian
+ */
 public class Database {
     private HashMap<String,UserData> users;
     private String databaseFile;
 
-    public Database(String databaseFile) {
+    /**
+     * initializes the UserData objects
+     * @param databaseFile the database file path
+     * @throws GeneralException
+     */
+    public Database(String databaseFile) throws GeneralException {
         this.databaseFile = databaseFile;
         this.users = new HashMap<>();
 
@@ -41,14 +51,22 @@ public class Database {
         }
         catch(FileNotFoundException e)
         {
-            e.printStackTrace();
+            throw new GeneralException();
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            throw new GeneralException();
         }
     }
 
+    /**
+     * checks if a cr for the user login is correct
+     * @param user the user to check for
+     * @param nonce the nonce used
+     * @param cr the challenge-response, sent by the client
+     * @return true if the cr was correct
+     * @throws Exception
+     */
     public boolean checkCR(String user,String nonce,String cr) throws Exception {
         synchronized(this.users) {
             if(!this.users.containsKey(user)) {
@@ -60,6 +78,11 @@ public class Database {
         }
     }
 
+    /**
+     * collects the user's balance
+     * @param username the user's name
+     * @return the balance string
+     */
     public String collectBalance(String username) {
         synchronized(this.users) {
             StringBuilder sb = new StringBuilder();
@@ -77,24 +100,48 @@ public class Database {
         }
     }
 
+    /**
+     * gets the user's email address
+     * @param username the user's name
+     * @return the email address
+     */
     public String getUserMail(String username) {
 	synchronized (this.users) {
 	    return this.users.get(username).getEmail();
 	}
     }
 
+    /**
+     * registers a device for a user
+     * @param username the user's name
+     * @param deviceCode the device code
+     */
     public void registerDevice(String username,String deviceCode) {
 	synchronized (this.users) {
 	    this.users.get(username).addDevice(deviceCode);
 	}
     }
 
+    /**
+     * delete a user's device
+     * @param username the user's name
+     * @param deviceCode the device code
+     */
     public void deleteDevice(String username, String deviceCode) {
 	synchronized (this.users) {
 	    this.users.get(username).removeDevice(deviceCode);
 	}
     }
 
+    /**
+     * check if the cr for a device auth was correct
+     * @param userName the user's name
+     * @param device the device
+     * @param nonce the nonce used for the cr
+     * @param cr the cr sent by the client
+     * @return true if the challenge-response was correct
+     * @throws Exception
+     */
     public boolean checkAuthCR(String userName, String device, String nonce, String cr) throws Exception {
 	synchronized (this.users) {
 	    if(!Misc.ALLOW_PERMANENT_DEVICES) {
@@ -109,6 +156,13 @@ public class Database {
 	}
     }
 
+    /**
+     * do a transaction
+     * @param userName the sender's name
+     * @param receiver the receiver's name
+     * @param amount the amount
+     * @return false if there was an error
+     */
     public boolean doTransaction(String userName, String receiver, int amount) {
 	synchronized (this.users) {
 	    if(!this.users.containsKey(receiver) || this.users.get(userName).getMoney() < amount) {
