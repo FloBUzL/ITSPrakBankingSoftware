@@ -1,50 +1,56 @@
 package server.worker;
 
+import java.util.Date;
+import java.util.Properties;
+
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import com.sun.mail.smtp.SMTPTransport;
+
 import server.connection.ServerConnectionData;
 import shared.connection.Message;
 import shared.constants.Misc;
 import shared.exception.AuthenticationException;
 import shared.exception.GeneralException;
-import shared.exception.NoSuchTaskException;
 import shared.security.RandomString;
 import shared.superclassifragilistic.Worker;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import com.sun.mail.smtp.SMTPTransport;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.Date;
-import java.util.Properties;
-
-
+/**
+ * worker for doing a transaction
+ * @author Florian
+ */
 public class ServerTransactionWorker extends ServerWorker {
-
+    /**
+     * constructor
+     * @param connectionData the connection's data
+     */
     public ServerTransactionWorker(ServerConnectionData connectionData) {
 	super(connectionData);
-	// TODO Auto-generated constructor stub
     }
 
     @Override
+    /**
+     * doesn't do anything yet
+     */
     public Worker setup() {
-	// TODO Auto-generated method stub
 	return this;
     }
 
     @Override
+    /**
+     * runs the auth process and transaction
+     */
     public Worker run() throws Exception {
+	// authenticate user's device
 	this.checkAuthentication();
 	if(!this.connectionData.isAuthenticated()) {
-	    this.debug("not authenticated");
+	    this.connectionData.debug("not authenticated");
 	    return this;
 	}
-	this.debug("authenticated");
+	this.connectionData.debug("authenticated");
+	// do transaction
 	this.handleTransaction();
 	this.succeeded = true;
 
@@ -52,6 +58,7 @@ public class ServerTransactionWorker extends ServerWorker {
     }
 
     private void checkAuthentication() throws Exception {
+	// check if device is already authenticated
 	if(this.connectionData.isAuthenticated()) {
 	    this.connectionData.getConnection().write(new Message()
 		.addData("task", "transaction")
@@ -69,8 +76,6 @@ public class ServerTransactionWorker extends ServerWorker {
 		.addData("message", "finish_registration");
 	Message authCodeAnswer = new Message()
 		.addData("task", "transaction");
-	boolean registered = false;
-	boolean authenticated = false;
 	boolean loop = true;
 	Message clientRequest;
 	Message crCode;
@@ -87,6 +92,7 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    Message authReply = new Message()
 	    		    .addData("task", "transaction");
 
+	    	    // check if user authenticated successfully
 	    	    if(this.connectionData.getDatabase().checkAuthCR(this.connectionData.getUserName(), deviceCode, nonce, clientCR)) {
 	    		loop = false;
 	    		this.connectionData.authenticate();
@@ -97,6 +103,7 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    this.connectionData.getConnection().write(authReply);
 	    	break;
 	    	case "register_device" :
+	    	    // registers new device
 	    	    String clientCode = clientRequest.getData("code");
 	    	    if(clientCode.length() != 16) {
 	    		throw new AuthenticationException();
@@ -104,7 +111,8 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    String serverCodeFirstPart = new RandomString(8).toString();
 	    	    String serverCodeSecondPart = new RandomString(8).toString();
 
-	    	    this.debug("new device registered - authcode: " + serverCodeFirstPart);
+	    	    // sends auth code
+	    	    this.connectionData.debug("new device registered - authcode: " + serverCodeFirstPart);
 	    	    this.sendMail(this.connectionData.getDatabase().getUserMail(this.connectionData.getUserName()), serverCodeFirstPart);
 
 	    	    this.connectionData.getDatabase().registerDevice(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart);
@@ -112,6 +120,7 @@ public class ServerTransactionWorker extends ServerWorker {
 	    	    this.connectionData.getConnection().write(finishRegistration);
 	    	    crCode = this.connectionData.getConnection().read();
 	    	    cr = crCode.getData("cr");
+	    	    // checks auth code
 	    	    if(this.connectionData.getDatabase().checkAuthCR(this.connectionData.getUserName(),clientCode + serverCodeFirstPart + serverCodeSecondPart,nonce,cr)) {
 	    		this.connectionData.authenticate();
 	    		authCodeAnswer.addData("message", "success");
@@ -144,7 +153,7 @@ public class ServerTransactionWorker extends ServerWorker {
 	    throw new GeneralException();
 	}
 
-	this.debug("executing transaction...");
+	this.connectionData.debug("executing transaction...");
 
 	if(this.connectionData.getDatabase().doTransaction(this.connectionData.getUserName(),receiver,Integer.parseInt(amount))) {
 	    transactionResponse.addData("message", "success");

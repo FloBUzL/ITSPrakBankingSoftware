@@ -9,15 +9,26 @@ import shared.security.Hex;
 import shared.security.RandomString;
 import shared.superclassifragilistic.Worker;
 
+/**
+ * handles the authentication process
+ * @author Florian
+ */
 public class ServerLoginWorker extends ServerWorker {
     private DiffieHellboy dh;
     private Hex hex;
 
+    /**
+     * constructor
+     * @param connectionData the connection's data
+     */
     public ServerLoginWorker(ServerConnectionData connectionData) {
 	super(connectionData);
     }
 
     @Override
+    /**
+     * sets up the objects needed for the key exchange
+     */
     public Worker setup() {
 	this.hex = new Hex("sorrybutthatsnosecret");
 	this.dh = new DiffieHellboy();
@@ -25,20 +36,25 @@ public class ServerLoginWorker extends ServerWorker {
     }
 
     @Override
+    /**
+     * runs the auth process
+     */
     public Worker run() throws Exception {
 	Message publicKeyMessage = new Message();
 	Message publicClientKey;
 	Message nonceMessage = new Message();
 	Message loginMessage;
 	Message loginResponse = new Message();
-	String key;
+
 	byte[] pClientKey;
 	byte[] sharedSecret;
+
+	String key;
 	String nonce;
 	String username;
 	String clientCR;
-	String serverCR;
 
+	// creates keys and sends public key
 	this.dh.createKeyPair();
 	key = hex.toHex(this.dh.getEncodedPublicKey());
 
@@ -48,15 +64,18 @@ public class ServerLoginWorker extends ServerWorker {
 
 	this.connectionData.getConnection().write(publicKeyMessage);
 
+	// gets client's public key
 	publicClientKey = this.connectionData.getConnection().read();
 	pClientKey = hex.fromHex(publicClientKey.getData("key"));
 	this.dh.addPKToKeyAgreement(pClientKey);
 
+	// generates aes object
 	sharedSecret = this.dh.generateSecret();
 	this.connectionData.setAes(new AES(sharedSecret));
 
+
+	// sends nonce to client
 	nonce = new RandomString(32).toString();
-	this.debug("Nonce: " + nonce);
 
 	nonceMessage
 		.addData("task", "send_nonce")
@@ -64,6 +83,7 @@ public class ServerLoginWorker extends ServerWorker {
 
 	this.connectionData.getConnection().write(nonceMessage);
 
+	// checks if user authenticated successfully
 	loginMessage = this.connectionData.getConnection().read();
 	clientCR = this.connectionData.getAes().decode(loginMessage.getData("cr"));
 	username = loginMessage.getData("user");
@@ -71,8 +91,6 @@ public class ServerLoginWorker extends ServerWorker {
 	if(this.connectionData.getAuthErrors().isUserBlocked(username) || this.connectionData.getAuthErrors().isHostBlocked(this.connectionData.getConnection().getIP())) {
 	    throw new AuthenticationException();
 	}
-
-	this.debug("got cr: " + clientCR);
 
 	if(this.connectionData.getDatabase().checkCR(username, nonce, clientCR)) {
 	    loginResponse
