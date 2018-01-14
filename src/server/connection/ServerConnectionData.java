@@ -6,7 +6,7 @@ import shared.connection.Connection;
 import shared.security.AES;
 import shared.superclassifragilistic.ConnectionData;
 
-public class ServerConnectionData implements ConnectionData {
+public class ServerConnectionData extends ConnectionData {
     private Database database = null;
     private String userName = null;
     private Connection connection = null;

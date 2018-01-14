@@ -1,8 +1,6 @@
 package client.connection;
 
-import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import client.worker.ClientBalanceWorker;
 import client.worker.ClientLoginWorker;
