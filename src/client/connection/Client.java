@@ -3,23 +3,28 @@ package client.connection;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.logging.Logger;
 
 import client.worker.ClientBalanceWorker;
 import client.worker.ClientLoginWorker;
 import client.worker.ClientTransactionWorker;
 import shared.connection.Connection;
-import shared.superclassifragilistic.Worker;
 
+/**
+ * listens to the terminal and delegates commands
+ * @author Florian
+ */
 public class Client {
     private Connection connection;
-    private Logger logger;
     private Terminal terminal;
     private ClientConnectionData connectionData;
 
+    /**
+     * connects to the server
+     * @param host the server's address
+     * @param port the port the server's service listens to
+     */
     public Client(String host,int port) {
 	this.connectionData = new ClientConnectionData();
-	this.logger = Logger.getAnonymousLogger();
 	this.terminal = new Terminal();
 
 	this.connectionData.setTerminal(this.terminal);
@@ -27,20 +32,18 @@ public class Client {
 	try {
 	    this.connection = new Connection(new Socket(host,port));
 	    this.connectionData.setConnection(this.connection);
-	    this.logger.info("connected to " + host + " on port " + port);
-	} catch (UnknownHostException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(0);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(0);
+	    this.terminal.write("connected to banking server");
+	} catch (Exception e) {
+	    this.terminal.write("could not connect to server");
 	}
     }
 
+    /**
+     * executes the login process and listens for commands
+     */
     public void run() {
 	try {
+	    // login
 	    while(!new ClientLoginWorker(this.connectionData).setup().run().isSucceeded()) {}
 	    while(true) {
 		this.terminal.write("waiting for input... [b] balance [t] transaction [e] exit");
@@ -51,6 +54,7 @@ public class Client {
 	    		case "exit" :
 	    		case "q" :
 	    		case "quit" :
+	    		case "logout" :
 	    		    this.terminal.write("closing connection");
 	    		    this.connection.close();
 	    		    return;
