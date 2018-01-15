@@ -5,67 +5,93 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.logging.Logger;
 
+/**
+ * wrapper object for the socket object
+ * 
+ * @author Florian
+ */
 public class Connection {
-    private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private Logger logger;
+	private Socket socket;
+	private PrintWriter out;
+	private BufferedReader in;
 
-    public Connection(Socket socket) {
-	this.socket = socket;
-	this.logger = Logger.getAnonymousLogger();
+	/**
+	 * constructor; sets up socket IO
+	 * 
+	 * @param socket
+	 *            the socket to use
+	 */
+	public Connection(Socket socket) {
+		this.socket = socket;
 
-	try {
-	    this.out = new PrintWriter(socket.getOutputStream());
-	    this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(0);
+		try {
+			this.out = new PrintWriter(socket.getOutputStream());
+			this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
 	}
-    }
 
-    public Message read() {
-	try {
-	    this.logger.info("waiting for message...");
-	    String line = this.in.readLine();
-	    this.logger.info("received message " + line);
-	    return Message.fromString(line);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    return null;
+	/**
+	 * closes the socket
+	 */
+	public void close() {
+		try {
+			this.in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.out.close();
+		try {
+			this.socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-    }
 
-    public void write(Message line) {
-	this.out.println(line);
-	this.out.flush();
-    }
-
-    public String getIP() {
-	return this.socket.getInetAddress().toString();
-    }
-
-    public boolean isClosed() {
-	return this.socket.isClosed();
-    }
-
-    public void close() {
-	try {
-	    this.in.close();
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	/**
+	 * gets the client's ip (probably)
+	 * 
+	 * @return the client's ip
+	 */
+	public String getIP() {
+		return this.socket.getInetAddress().toString();
 	}
-	this.out.close();
-	try {
-	    this.socket.close();
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+
+	/**
+	 * checks if the socket is closed
+	 * 
+	 * @return true if closed
+	 */
+	public boolean isClosed() {
+		return this.socket.isClosed();
 	}
-    }
+
+	/**
+	 * waits for a message
+	 * 
+	 * @return the message received
+	 */
+	public Message read() {
+		try {
+			String line = this.in.readLine();
+			return Message.fromString(line);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * sends a message
+	 * 
+	 * @param msg
+	 *            the message to send
+	 */
+	public void write(Message msg) {
+		this.out.println(msg);
+		this.out.flush();
+	}
 }
