@@ -2,6 +2,7 @@ package shared.security;
 
 /**
  * wrapper object for an int
+ * 
  * @author Florian
  */
 public class IntWrapper {
@@ -16,22 +17,27 @@ public class IntWrapper {
 
 	/**
 	 * initializes object with init
-	 * @param init the value for init
+	 * 
+	 * @param init
+	 *            the value for init
 	 */
 	public IntWrapper(int init) {
 		this.value = init;
 	}
 
 	/**
-	 * set the value
-	 * @param value the new value
+	 * adds a value to the object's value
+	 * 
+	 * @param val
+	 *            the value to add
 	 */
-	public void set(int value) {
-		this.value = value;
+	public void add(int val) {
+		this.value += val;
 	}
 
 	/**
 	 * getter for the value
+	 * 
 	 * @return the object's value
 	 */
 	public int get() {
@@ -39,11 +45,13 @@ public class IntWrapper {
 	}
 
 	/**
-	 * adds a value to the object's value
-	 * @param val the value to add
+	 * set the value
+	 * 
+	 * @param value
+	 *            the new value
 	 */
-	public void add(int val) {
-		this.value += val;
+	public void set(int value) {
+		this.value = value;
 	}
 
 	/**

@@ -14,203 +14,196 @@ import shared.superclassifragilistic.Worker;
 
 /**
  * the worker used for authenticate the device and run a transaction
+ * 
  * @author Florian
  */
 public class ClientTransactionWorker extends ClientWorker {
-    private boolean authenticated = false;
+	private boolean authenticated = false;
 
-    /**
-     * the constructor
-     * @param connectionData the connection's data
-     */
-    public ClientTransactionWorker(ClientConnectionData connectionData) {
-	super(connectionData);
-    }
-
-    @Override
-    /**
-     * doesn't do anything yet
-     */
-    public Worker setup() {
-	return this;
-    }
-
-    @Override
-    /**
-     * runs authentication and transaction
-     */
-    public Worker run() throws Exception {
-	// first authenticate the device
-	this.checkForAuthentification();
-	if(!this.authenticated) {
-	    return this;
-	}
-	this.handleTransaction();
-
-	return this;
-    }
-
-    private void checkForAuthentification() throws Exception {
-	String clientDeviceCode = new RandomString(16).toString();
-	Message requestTransaction = new Message()
-		.addData("task", "transaction")
-		.addData("message", "request");
-	Message registerDevice = new Message()
-		.addData("task", "transaction")
-		.addData("message", "register_device")
-		.addData("code", clientDeviceCode);
-	Message sendAuthCode = new Message()
-		.addData("task", "transaction")
-		.addData("message", "send_authcode");
-	Message nonceMsg;
-	Message authReply;
-
-	String nonce;
-	String serverDeviceCode;
-	String authCode;
-	String email;
-	String hash;
-
-	// receive a nonce
-	this.connectionData.getConnection().write(requestTransaction);
-	nonceMsg = this.connectionData.getConnection().read();
-
-	// if the device is already authenticated, skip
-	if(nonceMsg.getData("message").equals("pass_authentication")) {
-	    this.authenticated = true;
-	    return;
+	/**
+	 * the constructor
+	 * 
+	 * @param connectionData
+	 *            the connection's data
+	 */
+	public ClientTransactionWorker(ClientConnectionData connectionData) {
+		super(connectionData);
 	}
 
-	nonce = nonceMsg.getData("nonce");
+	/**
+	 * authenticates the device if already registered
+	 * 
+	 * @param nonce
+	 *            the current nonce
+	 * @return true if succeeded
+	 */
+	private boolean autoAuthenticateDevice(String nonce) {
+		String devCode = "";
+		String authCode = "";
+		String cr = "";
+		Message autoAuthenticate = new Message().addData("task", "transaction").addData("message",
+				"authenticate_device");
+		Message reply;
 
-	// if the device is already registered, authenticate
-	if(Misc.ALLOW_PERMANENT_DEVICES) {
-	    this.authenticated = this.autoAuthenticateDevice(nonce);
-	    if(this.authenticated == true) {
-		return;
-	    }
+		try {
+			// checks if file is existant and reads the device code
+			File device = new File("resources/device_" + this.connectionData.getUsername());
+			if (!device.exists()) {
+				return false;
+			}
+			BufferedReader br = new BufferedReader(new FileReader(device));
+			devCode = br.readLine();
+			br.close();
+			// generated authcode
+			authCode = devCode.substring(16, 24);
+
+			devCode = this.connectionData.getAes().encode(devCode);
+
+			// generate chalange-response
+
+			cr = new Hash(authCode + nonce).toString();
+			autoAuthenticate.addData("device", devCode);
+			autoAuthenticate.addData("cr", cr);
+			this.connectionData.getConnection().write(autoAuthenticate);
+			reply = this.connectionData.getConnection().read();
+			if (reply.getData("message").equals("failed")) {
+				return false;
+			}
+		} catch (Exception e) {
+			return false;
+		}
+
+		return true;
 	}
 
-	this.connectionData.getConnection().write(registerDevice);
+	private void checkForAuthentification() throws Exception {
+		String clientDeviceCode = new RandomString(16).toString();
+		Message requestTransaction = new Message().addData("task", "transaction").addData("message", "request");
+		Message registerDevice = new Message().addData("task", "transaction").addData("message", "register_device")
+				.addData("code", clientDeviceCode);
+		Message sendAuthCode = new Message().addData("task", "transaction").addData("message", "send_authcode");
+		Message nonceMsg;
+		Message authReply;
 
-	// wait for the server's message
-	this.connectionData.getConnection().read();
+		String nonce;
+		String serverDeviceCode;
+		String authCode;
+		String hash;
 
-	// authenticate the device
-	this.connectionData.getTerminal().write("enter authentication code");
-	authCode = this.connectionData.getTerminal().read();
-	this.connectionData.getTerminal().write("enter email adress");
-	email = this.connectionData.getTerminal().read();
+		// receive a nonce
+		this.connectionData.getConnection().write(requestTransaction);
+		nonceMsg = this.connectionData.getConnection().read();
 
-	hash = new Hash(authCode + email + nonce).toString();
-	sendAuthCode.addData("cr", hash);
+		// if the device is already authenticated, skip
+		if (nonceMsg.getData("message").equals("pass_authentication")) {
+			this.authenticated = true;
+			return;
+		}
 
-	this.connectionData.getConnection().write(sendAuthCode);
+		nonce = nonceMsg.getData("nonce");
 
-	authReply = this.connectionData.getConnection().read();
-	// check if authentication worked
-	if(authReply.getData("message").equals("success")) {
-	    serverDeviceCode = authReply.getData("code");
-	    // writes device file
-	    if(Misc.ALLOW_PERMANENT_DEVICES) {
-		this.writeDeviceFile(clientDeviceCode + serverDeviceCode);
-	    }
-	    this.connectionData.getTerminal().write("device registered");
-	    this.authenticated = true;
-	} else {
-	    this.connectionData.getTerminal().write("device registration failed");
-	}
-    }
+		// if the device is already registered, authenticate
+		if (Misc.ALLOW_PERMANENT_DEVICES) {
+			this.authenticated = this.autoAuthenticateDevice(nonce);
+			if (this.authenticated == true) {
+				return;
+			}
+		}
 
-    /**
-     * authenticates the device if already registered
-     * @param nonce the current nonce
-     * @return true if succeeded
-     */
-    private boolean autoAuthenticateDevice(String nonce) {
-	String devCode = "";
-	String email = "";
-	String authCode = "";
-	String cr = "";
-	Message autoAuthenticate = new Message()
-		.addData("task", "transaction")
-		.addData("message", "authenticate_device");
-	Message reply;
+		this.connectionData.getConnection().write(registerDevice);
 
-	try {
-	    // checks if file is existant and reads the device code
-	    File device = new File("resources/device_" + this.connectionData.getUsername());
-	    if(!device.exists()) {
-		return false;
-	    }
-	    BufferedReader br = new BufferedReader(new FileReader(device));
-	    devCode = br.readLine();
-	    br.close();
-	    // generated authcode
-	    authCode = devCode.substring(16,24);
+		// wait for the server's message
+		this.connectionData.getConnection().read();
 
-	    // generate chalange-response
-	    this.connectionData.getTerminal().write("enter your email adress for authentication");
-	    email = this.connectionData.getTerminal().read();
-	    cr = new Hash(authCode + email + nonce).toString();
-	    autoAuthenticate.addData("device", devCode);
-	    autoAuthenticate.addData("cr", cr);
-	    this.connectionData.getConnection().write(autoAuthenticate);
-	    reply = this.connectionData.getConnection().read();
-	    if(reply.getData("message").equals("failed")) {
-		return false;
-	    }
-	} catch (Exception e) {
-	    return false;
+		// authenticate the device
+		this.connectionData.getTerminal().write("enter authentication code");
+		authCode = this.connectionData.getTerminal().read();
+
+		hash = new Hash(authCode + nonce).toString();
+		sendAuthCode.addData("cr", hash);
+
+		this.connectionData.getConnection().write(sendAuthCode);
+
+		authReply = this.connectionData.getConnection().read();
+		// check if authentication worked
+		if (authReply.getData("message").equals("success")) {
+			serverDeviceCode = authReply.getData("code");
+			// writes device file
+			if (Misc.ALLOW_PERMANENT_DEVICES) {
+				this.writeDeviceFile(clientDeviceCode + serverDeviceCode);
+			}
+			this.connectionData.getTerminal().write("device registered");
+			this.authenticated = true;
+		} else {
+			this.connectionData.getTerminal().write("device registration failed");
+		}
 	}
 
-	return true;
-    }
+	/**
+	 * handles the money transaction to another user
+	 * 
+	 * @throws Exception
+	 */
+	private void handleTransaction() throws Exception {
+		String receiver;
+		String amount;
+		Message sendTransaction = new Message().addData("task", "transaction").addData("message", "do_transaction");
+		Message response;
 
-    /**
-     * handles the money transaction to another user
-     * @throws Exception
-     */
-    private void handleTransaction() throws Exception {
-	String receiver;
-	String amount;
-	Message sendTransaction = new Message()
-		.addData("task", "transaction")
-		.addData("message", "do_transaction");
-	Message response;
+		this.connectionData.getTerminal().write("enter receiver");
+		receiver = this.connectionData.getTerminal().read();
 
-	this.connectionData.getTerminal().write("enter receiver");
-	receiver = this.connectionData.getTerminal().read();
+		// tries until a amount is typed that's between 1 and 10 (inclusive)
+		do {
+			this.connectionData.getTerminal().write("enter amount (1-10)");
+			amount = this.connectionData.getTerminal().read();
+		} while (!amount.matches("[0-9]|10"));
 
-	// tries until a amount is typed that's between 1 and 10 (inclusive)
-	do {
-	    this.connectionData.getTerminal().write("enter amount (1-10)");
-	    amount = this.connectionData.getTerminal().read();
-	} while(!amount.matches("[0-9]|10"));
+		// does the transaction
+		sendTransaction.addData("receiver", this.connectionData.getAes().encode(receiver)).addData("amount",
+				this.connectionData.getAes().encode(amount));
 
-	// does the transaction
-	sendTransaction
-		.addData("receiver", this.connectionData.getAes().encode(receiver))
-		.addData("amount", this.connectionData.getAes().encode(amount));
+		this.connectionData.getConnection().write(sendTransaction);
 
-	this.connectionData.getConnection().write(sendTransaction);
-
-	response = this.connectionData.getConnection().read();
-	if(response.getData("message").equals("success")) {
-	    this.connectionData.getTerminal().write("transaction done");
-	} else {
-	    this.connectionData.getTerminal().write("transaction failed. entered correct username?");
+		response = this.connectionData.getConnection().read();
+		if (response.getData("message").equals("success")) {
+			this.connectionData.getTerminal().write("transaction done");
+		} else {
+			this.connectionData.getTerminal().write("transaction failed. entered correct username?");
+		}
 	}
-    }
 
-    private void writeDeviceFile(String deviceCode) {
-	try {
-	    this.connectionData.debug("get username: " + this.connectionData.getUsername());
-	    PrintWriter file = new PrintWriter("resources/device_" + this.connectionData.getUsername());
-	    file.write(deviceCode);
-	    file.close();
-	} catch(Exception e) {
+	@Override
+	/**
+	 * runs authentication and transaction
+	 */
+	public Worker run() throws Exception {
+		// first authenticate the device
+		this.checkForAuthentification();
+		if (!this.authenticated) {
+			return this;
+		}
+		this.handleTransaction();
 
+		return this;
 	}
-    }
+
+	@Override
+	/**
+	 * doesn't do anything yet
+	 */
+	public Worker setup() {
+		return this;
+	}
+
+	private void writeDeviceFile(String deviceCode) {
+		try {
+			this.connectionData.debug("get username: " + this.connectionData.getUsername());
+			PrintWriter file = new PrintWriter("resources/device_" + this.connectionData.getUsername());
+			file.write(deviceCode);
+			file.close();
+		} catch (Exception e) {
+
+		}
+	}
 }
