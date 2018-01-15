@@ -5,12 +5,13 @@ import shared.superclassifragilistic.Worker;
 
 /**
  * abstract worker class of the server
+ * 
  * @author Florian
  */
 public abstract class ServerWorker extends Worker {
-    protected ServerConnectionData connectionData;
+	protected ServerConnectionData connectionData;
 
-    public ServerWorker(ServerConnectionData connectionData) {
-	this.connectionData = connectionData;
-    }
+	public ServerWorker(ServerConnectionData connectionData) {
+		this.connectionData = connectionData;
+	}
 }

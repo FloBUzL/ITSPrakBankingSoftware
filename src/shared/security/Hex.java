@@ -6,6 +6,7 @@ import java.util.Random;
 
 /**
  * used for turning a byte array to a hex string and vice versa
+ * 
  * @author Florian
  */
 public class Hex {
@@ -15,7 +16,9 @@ public class Hex {
 
 	/**
 	 * constructor
-	 * @param init string used for creating the random's seed
+	 * 
+	 * @param init
+	 *            string used for creating the random's seed
 	 */
 	public Hex(String init) {
 		this.setUpRandom(init);
@@ -26,8 +29,8 @@ public class Hex {
 		IntWrapper randInit = new IntWrapper();
 		init.chars().forEach((chr) -> {
 			int chrSum = 1;
-			for(int i = 0;i <= chr;i++) {
-				chrSum += (i+1) * chr * chr;
+			for (int i = 0; i <= chr; i++) {
+				chrSum += (i + 1) * chr * chr;
 			}
 			randInit.add(chrSum);
 		});
@@ -39,17 +42,21 @@ public class Hex {
 		this.charTable = new char[16];
 
 		ArrayList<Character> chars = new ArrayList<Character>();
-		Hex.charList.chars().forEach((chr) -> { chars.add((char) chr); });
-		Collections.shuffle(chars,this.rand);
+		Hex.charList.chars().forEach((chr) -> {
+			chars.add((char) chr);
+		});
+		Collections.shuffle(chars, this.rand);
 
-		for(int i = 0;i < this.charTable.length;i++) {
+		for (int i = 0; i < this.charTable.length; i++) {
 			this.charTable[i] = chars.get(i);
 		}
 	}
 
 	/**
 	 * converts byte array to hex string
-	 * @param input the byte array
+	 * 
+	 * @param input
+	 *            the byte array
 	 * @return the hex string
 	 */
 	public String toHex(byte[] input) {
@@ -61,7 +68,7 @@ public class Hex {
 		byte mask = 15;
 		byte shift = 4;
 
-		for(int i = 0;i < bytes.length;i++) {
+		for (int i = 0; i < bytes.length; i++) {
 			lower = (byte) (bytes[i] & mask);
 			upper = (byte) ((bytes[i] >> shift) & mask);
 
@@ -74,21 +81,23 @@ public class Hex {
 
 	/**
 	 * converts hex string to byte array
-	 * @param input the hex string
+	 * 
+	 * @param input
+	 *            the hex string
 	 * @return the byte array
 	 */
 	public byte[] fromHex(String input) {
-	    	char[] chars = input.toCharArray();
-		byte[] bytes = new byte[chars.length/2];
+		char[] chars = input.toCharArray();
+		byte[] bytes = new byte[chars.length / 2];
 		byte resByte = 0;
 		byte shift = 4;
 		int byteCount = 0;
 		boolean left = true;
 
-		for(int i = 0;i < chars.length;i++) {
-			for(int j = 0;j < this.charTable.length;j++) {
-				if(this.charTable[j] == chars[i]) {
-					if(left) {
+		for (int i = 0; i < chars.length; i++) {
+			for (int j = 0; j < this.charTable.length; j++) {
+				if (this.charTable[j] == chars[i]) {
+					if (left) {
 						resByte = (byte) (j << shift);
 					} else {
 						resByte = (byte) (resByte | j);

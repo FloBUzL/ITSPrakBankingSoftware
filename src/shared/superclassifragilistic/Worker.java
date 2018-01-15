@@ -2,29 +2,33 @@ package shared.superclassifragilistic;
 
 /**
  * abstract worker class
+ * 
  * @author Florian Berberich
  */
 public abstract class Worker {
-    protected boolean succeeded = false;
+	protected boolean succeeded = false;
 
-    /**
-     * should setup all needed objects
-     * @return the object itself
-     */
-    abstract public Worker setup();
+	/**
+	 * should setup all needed objects
+	 * 
+	 * @return the object itself
+	 */
+	abstract public Worker setup();
 
-    /**
-     * runs the server
-     * @return the object itself
-     * @throws Exception
-     */
-    abstract public Worker run() throws Exception;
+	/**
+	 * runs the server
+	 * 
+	 * @return the object itself
+	 * @throws Exception
+	 */
+	abstract public Worker run() throws Exception;
 
-    /**
-     * returns if the worker succeeded
-     * @return
-     */
-    public boolean isSucceeded() {
-	return this.succeeded;
-    }
+	/**
+	 * returns if the worker succeeded
+	 * 
+	 * @return
+	 */
+	public boolean isSucceeded() {
+		return this.succeeded;
+	}
 }

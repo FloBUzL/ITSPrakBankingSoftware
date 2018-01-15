@@ -1,13 +1,13 @@
 package shared.exception;
 
 public class GeneralException extends Exception {
-    private static final long serialVersionUID = -1726519269072204026L;
+	private static final long serialVersionUID = -1726519269072204026L;
 
-    public GeneralException() {
+	public GeneralException() {
 
-    }
+	}
 
-    public GeneralException(String msg) {
-	super(msg);
-    }
+	public GeneralException(String msg) {
+		super(msg);
+	}
 }
