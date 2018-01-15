@@ -88,7 +88,7 @@ public class ServerTransactionWorker extends ServerWorker {
 	    switch(clientRequest.getData("message")) {
 	    	case "authenticate_device" :
 	    	    String clientCR = clientRequest.getData("cr");
-	    	    String deviceCode = clientRequest.getData("device");
+	    	    String deviceCode = this.connectionData.getAes().decode(clientRequest.getData("device"));
 	    	    Message authReply = new Message()
 	    		    .addData("task", "transaction");
 

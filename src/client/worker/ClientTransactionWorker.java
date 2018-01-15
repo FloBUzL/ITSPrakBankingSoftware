@@ -68,7 +68,6 @@ public class ClientTransactionWorker extends ClientWorker {
 	String nonce;
 	String serverDeviceCode;
 	String authCode;
-	String email;
 	String hash;
 
 	// receive a nonce
@@ -99,10 +98,8 @@ public class ClientTransactionWorker extends ClientWorker {
 	// authenticate the device
 	this.connectionData.getTerminal().write("enter authentication code");
 	authCode = this.connectionData.getTerminal().read();
-	this.connectionData.getTerminal().write("enter email adress");
-	email = this.connectionData.getTerminal().read();
 
-	hash = new Hash(authCode + email + nonce).toString();
+	hash = new Hash(authCode + nonce).toString();
 	sendAuthCode.addData("cr", hash);
 
 	this.connectionData.getConnection().write(sendAuthCode);
@@ -129,7 +126,6 @@ public class ClientTransactionWorker extends ClientWorker {
      */
     private boolean autoAuthenticateDevice(String nonce) {
 	String devCode = "";
-	String email = "";
 	String authCode = "";
 	String cr = "";
 	Message autoAuthenticate = new Message()
@@ -148,11 +144,12 @@ public class ClientTransactionWorker extends ClientWorker {
 	    br.close();
 	    // generated authcode
 	    authCode = devCode.substring(16,24);
+	    
+	    devCode = this.connectionData.getAes().encode(devCode);
 
 	    // generate chalange-response
-	    this.connectionData.getTerminal().write("enter your email adress for authentication");
-	    email = this.connectionData.getTerminal().read();
-	    cr = new Hash(authCode + email + nonce).toString();
+	    
+	    cr = new Hash(authCode + nonce).toString();
 	    autoAuthenticate.addData("device", devCode);
 	    autoAuthenticate.addData("cr", cr);
 	    this.connectionData.getConnection().write(autoAuthenticate);

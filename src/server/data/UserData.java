@@ -235,7 +235,7 @@ public class UserData {
 	if(!this.hasDevice(device)) {
 	    return null;
 	}
-	String authCode = device.substring(16, 24);
-	return new Hash(authCode + this.userEmail + nonce).toString();
+		String authCode = device.substring(16, 24);
+		return new Hash(authCode + nonce).toString();
     }
 }
