@@ -30,27 +30,50 @@ public class ClientTransactionWorker extends ClientWorker {
 		super(connectionData);
 	}
 
-	@Override
 	/**
-	 * doesn't do anything yet
+	 * authenticates the device if already registered
+	 * 
+	 * @param nonce
+	 *            the current nonce
+	 * @return true if succeeded
 	 */
-	public Worker setup() {
-		return this;
-	}
+	private boolean autoAuthenticateDevice(String nonce) {
+		String devCode = "";
+		String authCode = "";
+		String cr = "";
+		Message autoAuthenticate = new Message().addData("task", "transaction").addData("message",
+				"authenticate_device");
+		Message reply;
 
-	@Override
-	/**
-	 * runs authentication and transaction
-	 */
-	public Worker run() throws Exception {
-		// first authenticate the device
-		this.checkForAuthentification();
-		if (!this.authenticated) {
-			return this;
+		try {
+			// checks if file is existant and reads the device code
+			File device = new File("resources/device_" + this.connectionData.getUsername());
+			if (!device.exists()) {
+				return false;
+			}
+			BufferedReader br = new BufferedReader(new FileReader(device));
+			devCode = br.readLine();
+			br.close();
+			// generated authcode
+			authCode = devCode.substring(16, 24);
+
+			devCode = this.connectionData.getAes().encode(devCode);
+
+			// generate chalange-response
+
+			cr = new Hash(authCode + nonce).toString();
+			autoAuthenticate.addData("device", devCode);
+			autoAuthenticate.addData("cr", cr);
+			this.connectionData.getConnection().write(autoAuthenticate);
+			reply = this.connectionData.getConnection().read();
+			if (reply.getData("message").equals("failed")) {
+				return false;
+			}
+		} catch (Exception e) {
+			return false;
 		}
-		this.handleTransaction();
 
-		return this;
+		return true;
 	}
 
 	private void checkForAuthentification() throws Exception {
@@ -117,52 +140,6 @@ public class ClientTransactionWorker extends ClientWorker {
 	}
 
 	/**
-	 * authenticates the device if already registered
-	 * 
-	 * @param nonce
-	 *            the current nonce
-	 * @return true if succeeded
-	 */
-	private boolean autoAuthenticateDevice(String nonce) {
-		String devCode = "";
-		String authCode = "";
-		String cr = "";
-		Message autoAuthenticate = new Message().addData("task", "transaction").addData("message",
-				"authenticate_device");
-		Message reply;
-
-		try {
-			// checks if file is existant and reads the device code
-			File device = new File("resources/device_" + this.connectionData.getUsername());
-			if (!device.exists()) {
-				return false;
-			}
-			BufferedReader br = new BufferedReader(new FileReader(device));
-			devCode = br.readLine();
-			br.close();
-			// generated authcode
-			authCode = devCode.substring(16, 24);
-
-			devCode = this.connectionData.getAes().encode(devCode);
-
-			// generate chalange-response
-
-			cr = new Hash(authCode + nonce).toString();
-			autoAuthenticate.addData("device", devCode);
-			autoAuthenticate.addData("cr", cr);
-			this.connectionData.getConnection().write(autoAuthenticate);
-			reply = this.connectionData.getConnection().read();
-			if (reply.getData("message").equals("failed")) {
-				return false;
-			}
-		} catch (Exception e) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * handles the money transaction to another user
 	 * 
 	 * @throws Exception
@@ -194,6 +171,29 @@ public class ClientTransactionWorker extends ClientWorker {
 		} else {
 			this.connectionData.getTerminal().write("transaction failed. entered correct username?");
 		}
+	}
+
+	@Override
+	/**
+	 * runs authentication and transaction
+	 */
+	public Worker run() throws Exception {
+		// first authenticate the device
+		this.checkForAuthentification();
+		if (!this.authenticated) {
+			return this;
+		}
+		this.handleTransaction();
+
+		return this;
+	}
+
+	@Override
+	/**
+	 * doesn't do anything yet
+	 */
+	public Worker setup() {
+		return this;
 	}
 
 	private void writeDeviceFile(String deviceCode) {

@@ -22,14 +22,6 @@ public class ServerBalanceWorker extends ServerWorker {
 
 	@Override
 	/**
-	 * doesn't do anything yet
-	 */
-	public Worker setup() {
-		return this;
-	}
-
-	@Override
-	/**
 	 * sends the balance
 	 */
 	public Worker run() throws Exception {
@@ -43,5 +35,13 @@ public class ServerBalanceWorker extends ServerWorker {
 		Message balanceMessage = new Message().addData("task", "balance").addData("balance", balance);
 
 		this.connectionData.getConnection().write(balanceMessage);
+	}
+
+	@Override
+	/**
+	 * doesn't do anything yet
+	 */
+	public Worker setup() {
+		return this;
 	}
 }

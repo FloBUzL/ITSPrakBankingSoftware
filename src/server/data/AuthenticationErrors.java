@@ -29,6 +29,34 @@ public class AuthenticationErrors {
 	}
 
 	/**
+	 * decreases the counter for all hosts
+	 */
+	public void decreaseHostAttempts() {
+		int amount = 0;
+		for (String user : this.userErrors.keySet()) {
+			amount = this.userErrors.get(user);
+			if (amount > 0) {
+				amount -= 1;
+			}
+			this.userErrors.put(user, amount);
+		}
+	}
+
+	/**
+	 * decreases the counter for all users
+	 */
+	public void decreaseUserAttempts() {
+		int amount = 0;
+		for (String host : this.hostErrors.keySet()) {
+			amount = this.hostErrors.get(host);
+			if (amount > 0) {
+				amount -= 1;
+			}
+			this.hostErrors.put(host, amount);
+		}
+	}
+
+	/**
 	 * increases the error counter for a host
 	 * 
 	 * @param host
@@ -82,34 +110,6 @@ public class AuthenticationErrors {
 	 */
 	public boolean isUserBlocked(String user) {
 		return this.userErrors.containsKey(user) && (this.userErrors.get(user) > Misc.MAX_ATTEMPTS_USER);
-	}
-
-	/**
-	 * decreases the counter for all users
-	 */
-	public void decreaseUserAttempts() {
-		int amount = 0;
-		for (String host : this.hostErrors.keySet()) {
-			amount = this.hostErrors.get(host);
-			if (amount > 0) {
-				amount -= 1;
-			}
-			this.hostErrors.put(host, amount);
-		}
-	}
-
-	/**
-	 * decreases the counter for all hosts
-	 */
-	public void decreaseHostAttempts() {
-		int amount = 0;
-		for (String user : this.userErrors.keySet()) {
-			amount = this.userErrors.get(user);
-			if (amount > 0) {
-				amount -= 1;
-			}
-			this.userErrors.put(user, amount);
-		}
 	}
 }
 

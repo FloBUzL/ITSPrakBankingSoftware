@@ -13,6 +13,12 @@ import javax.json.JsonValue.ValueType;
 import shared.security.Hash;
 
 public class UserData {
+	public static UserData createFromJSONObject(JsonObject userData) {
+		UserData newUser = new UserData(userData);
+
+		return newUser;
+	}
+
 	private String userName;
 
 	/**
@@ -67,80 +73,6 @@ public class UserData {
 	}
 
 	/**
-	 * Saves the user's data into a JSON object.
-	 *
-	 * @return A JSON object with the user's data.
-	 * @deprecated Only for testing purposes.
-	 */
-	public JsonObject toJson() {
-		// Put device list into JSON array
-		JsonArrayBuilder deviceArrayBuilder = Json.createArrayBuilder();
-		for (String device : userDeviceAuthenticationStrings)
-			deviceArrayBuilder.add(device);
-
-		// Create user data JSON object
-		JsonObjectBuilder objBuilder = Json.createObjectBuilder();
-		objBuilder.add("name", userName);
-		objBuilder.add("email", userEmail);
-		objBuilder.add("password", userPassword);
-		objBuilder.add("money", userMoney);
-		objBuilder.add("devices", deviceArrayBuilder.build());
-		objBuilder.add("notify", notify);
-		return objBuilder.build();
-	}
-
-	public static UserData createFromJSONObject(JsonObject userData) {
-		UserData newUser = new UserData(userData);
-
-		return newUser;
-	}
-
-	/**
-	 * Returns the user's name.
-	 *
-	 * @return The user's name.
-	 */
-	public String getName() {
-		return userName;
-	}
-
-	/**
-	 * Returns the user's e-mail address.
-	 *
-	 * @return The user's e-mail address.
-	 */
-	public String getEmail() {
-		return userEmail;
-	}
-
-	/**
-	 * Checks whether the given credentials are valid for this user.
-	 *
-	 * @param name
-	 *            The name of the user.
-	 * @param password
-	 *            The password of the user.
-	 * @return A boolean value indicating whether the given credentials are valid
-	 *         for this user.
-	 */
-	public boolean verifyLogin(String name, String password) {
-		// Compare variables
-		return name.equalsIgnoreCase(userName) && password.equals(userPassword);
-	}
-
-	/**
-	 * create's a cr
-	 * 
-	 * @param nonce
-	 *            the nonce to use
-	 * @return the cr created
-	 * @throws Exception
-	 */
-	public String createCR(String nonce) throws Exception {
-		return new Hash(this.userName + this.userPassword + nonce).toString();
-	}
-
-	/**
 	 * Adds the device with the given authentication code.
 	 *
 	 * @param deviceCode
@@ -149,40 +81,6 @@ public class UserData {
 	public void addDevice(String deviceCode) {
 		// Add device
 		userDeviceAuthenticationStrings.add(deviceCode);
-	}
-
-	/**
-	 * deletes a device with given code
-	 * 
-	 * @param deviceCode
-	 *            the device's code
-	 */
-	public void removeDevice(String deviceCode) {
-		this.userDeviceAuthenticationStrings.remove(deviceCode);
-	}
-
-	/**
-	 * Checks whether this user has a device with the given code.
-	 *
-	 * @param deviceCode
-	 *            The device code to be searched.
-	 * @return Whether this user has a device with the given code.
-	 */
-	public boolean hasDevice(String deviceCode) {
-		// Find device
-		for (String code : userDeviceAuthenticationStrings)
-			if (code.equals(deviceCode))
-				return true;
-		return false;
-	}
-
-	/**
-	 * Returns the user's amount of money.
-	 *
-	 * @return The user's amount of money.
-	 */
-	public int getMoney() {
-		return userMoney;
 	}
 
 	/**
@@ -209,16 +107,6 @@ public class UserData {
 	}
 
 	/**
-	 * Returns a list containing the user's full money sending/receiving history.
-	 *
-	 * @return A list containing the given user's full money sending/receiving
-	 *         history.
-	 */
-	public LinkedList<Tuple<String, Integer>> getMoneyHistory() {
-		return userMoneyHistory;
-	}
-
-	/**
 	 * creates a cr
 	 * 
 	 * @param device
@@ -234,5 +122,117 @@ public class UserData {
 		}
 		String authCode = device.substring(16, 24);
 		return new Hash(authCode + nonce).toString();
+	}
+
+	/**
+	 * create's a cr
+	 * 
+	 * @param nonce
+	 *            the nonce to use
+	 * @return the cr created
+	 * @throws Exception
+	 */
+	public String createCR(String nonce) throws Exception {
+		return new Hash(this.userName + this.userPassword + nonce).toString();
+	}
+
+	/**
+	 * Returns the user's e-mail address.
+	 *
+	 * @return The user's e-mail address.
+	 */
+	public String getEmail() {
+		return userEmail;
+	}
+
+	/**
+	 * Returns the user's amount of money.
+	 *
+	 * @return The user's amount of money.
+	 */
+	public int getMoney() {
+		return userMoney;
+	}
+
+	/**
+	 * Returns a list containing the user's full money sending/receiving history.
+	 *
+	 * @return A list containing the given user's full money sending/receiving
+	 *         history.
+	 */
+	public LinkedList<Tuple<String, Integer>> getMoneyHistory() {
+		return userMoneyHistory;
+	}
+
+	/**
+	 * Returns the user's name.
+	 *
+	 * @return The user's name.
+	 */
+	public String getName() {
+		return userName;
+	}
+
+	/**
+	 * Checks whether this user has a device with the given code.
+	 *
+	 * @param deviceCode
+	 *            The device code to be searched.
+	 * @return Whether this user has a device with the given code.
+	 */
+	public boolean hasDevice(String deviceCode) {
+		// Find device
+		for (String code : userDeviceAuthenticationStrings)
+			if (code.equals(deviceCode))
+				return true;
+		return false;
+	}
+
+	/**
+	 * deletes a device with given code
+	 * 
+	 * @param deviceCode
+	 *            the device's code
+	 */
+	public void removeDevice(String deviceCode) {
+		this.userDeviceAuthenticationStrings.remove(deviceCode);
+	}
+
+	/**
+	 * Saves the user's data into a JSON object.
+	 *
+	 * @return A JSON object with the user's data.
+	 * @deprecated Only for testing purposes.
+	 */
+	public JsonObject toJson() {
+		// Put device list into JSON array
+		JsonArrayBuilder deviceArrayBuilder = Json.createArrayBuilder();
+		for (String device : userDeviceAuthenticationStrings)
+			deviceArrayBuilder.add(device);
+
+		// Create user data JSON object
+		JsonObjectBuilder objBuilder = Json.createObjectBuilder();
+		objBuilder.add("name", userName);
+		objBuilder.add("email", userEmail);
+		objBuilder.add("password", userPassword);
+		objBuilder.add("money", userMoney);
+		objBuilder.add("devices", deviceArrayBuilder.build());
+		objBuilder.add("notify", notify);
+		return objBuilder.build();
+	}
+
+	/**
+	 * Checks whether the given credentials are valid for this user.
+	 *
+	 * @param name
+	 *            The name of the user.
+	 * @param password
+	 *            The password of the user.
+	 * @return A boolean value indicating whether the given credentials are valid
+	 *         for this user.
+	 */
+	public boolean verifyLogin(String name, String password) {
+		// Compare variables
+		return name.equalsIgnoreCase(userName) && password.equals(userPassword);
 	}
 }

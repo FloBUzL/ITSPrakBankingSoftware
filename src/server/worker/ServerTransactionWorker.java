@@ -33,33 +33,6 @@ public class ServerTransactionWorker extends ServerWorker {
 		super(connectionData);
 	}
 
-	@Override
-	/**
-	 * doesn't do anything yet
-	 */
-	public Worker setup() {
-		return this;
-	}
-
-	@Override
-	/**
-	 * runs the auth process and transaction
-	 */
-	public Worker run() throws Exception {
-		// authenticate user's device
-		this.checkAuthentication();
-		if (!this.connectionData.isAuthenticated()) {
-			this.connectionData.debug("not authenticated");
-			return this;
-		}
-		this.connectionData.debug("authenticated");
-		// do transaction
-		this.handleTransaction();
-		this.succeeded = true;
-
-		return this;
-	}
-
 	private void checkAuthentication() throws Exception {
 		// check if device is already authenticated
 		if (this.connectionData.isAuthenticated()) {
@@ -167,6 +140,25 @@ public class ServerTransactionWorker extends ServerWorker {
 		this.connectionData.getConnection().write(transactionResponse);
 	}
 
+	@Override
+	/**
+	 * runs the auth process and transaction
+	 */
+	public Worker run() throws Exception {
+		// authenticate user's device
+		this.checkAuthentication();
+		if (!this.connectionData.isAuthenticated()) {
+			this.connectionData.debug("not authenticated");
+			return this;
+		}
+		this.connectionData.debug("authenticated");
+		// do transaction
+		this.handleTransaction();
+		this.succeeded = true;
+
+		return this;
+	}
+
 	private void sendMail(String email, String authcode) {
 		if (!Misc.SEND_MAIL) {
 			return;
@@ -195,5 +187,13 @@ public class ServerTransactionWorker extends ServerWorker {
 
 		}
 
+	}
+
+	@Override
+	/**
+	 * doesn't do anything yet
+	 */
+	public Worker setup() {
+		return this;
 	}
 }

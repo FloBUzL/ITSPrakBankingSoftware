@@ -20,6 +20,23 @@ public class DiffieHellboy {
 	private KeyAgreement keyAgree;
 
 	/**
+	 * add a public key to an agreement
+	 * 
+	 * @param encodedKey
+	 *            the key to use
+	 * @throws Exception
+	 */
+	public void addPKToKeyAgreement(byte[] encodedKey) throws Exception {
+		KeyFactory kF;
+		kF = KeyFactory.getInstance("DH");
+
+		X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(encodedKey);
+		PublicKey pK = kF.generatePublic(x509KeySpec);
+
+		this.keyAgree.doPhase(pK, true);
+	}
+
+	/**
 	 * creates a key pair
 	 * 
 	 * @throws Exception
@@ -58,20 +75,12 @@ public class DiffieHellboy {
 	}
 
 	/**
-	 * add a public key to an agreement
+	 * generated a shared secret
 	 * 
-	 * @param encodedKey
-	 *            the key to use
-	 * @throws Exception
+	 * @return the generated secret
 	 */
-	public void addPKToKeyAgreement(byte[] encodedKey) throws Exception {
-		KeyFactory kF;
-		kF = KeyFactory.getInstance("DH");
-
-		X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(encodedKey);
-		PublicKey pK = kF.generatePublic(x509KeySpec);
-
-		this.keyAgree.doPhase(pK, true);
+	public byte[] generateSecret() {
+		return this.keyAgree.generateSecret();
 	}
 
 	/**
@@ -81,14 +90,5 @@ public class DiffieHellboy {
 	 */
 	public byte[] getEncodedPublicKey() {
 		return this.keyPair.getPublic().getEncoded();
-	}
-
-	/**
-	 * generated a shared secret
-	 * 
-	 * @return the generated secret
-	 */
-	public byte[] generateSecret() {
-		return this.keyAgree.generateSecret();
 	}
 }

@@ -20,12 +20,11 @@ public class ClientBalanceWorker extends ClientWorker {
 		super(connectionData);
 	}
 
-	@Override
-	/**
-	 * doesn't do anything yet
-	 */
-	public Worker setup() {
-		return this;
+	private void receiveAndPrintBalance() throws Exception {
+		Message balance = this.connectionData.getConnection().read();
+		// receive and print encrypted balance
+		String toPrint = this.connectionData.getAes().decode(balance.getData("balance"));
+		this.connectionData.getTerminal().write(toPrint);
 	}
 
 	@Override
@@ -44,10 +43,11 @@ public class ClientBalanceWorker extends ClientWorker {
 		this.connectionData.getConnection().write(balanceRequest);
 	}
 
-	private void receiveAndPrintBalance() throws Exception {
-		Message balance = this.connectionData.getConnection().read();
-		// receive and print encrypted balance
-		String toPrint = this.connectionData.getAes().decode(balance.getData("balance"));
-		this.connectionData.getTerminal().write(toPrint);
+	@Override
+	/**
+	 * doesn't do anything yet
+	 */
+	public Worker setup() {
+		return this;
 	}
 }

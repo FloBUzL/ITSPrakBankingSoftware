@@ -8,15 +8,6 @@ import java.util.HashMap;
  * @author Florian
  */
 public class Message {
-	private HashMap<String, String> messageData;
-
-	/**
-	 * the default constructor
-	 */
-	public Message() {
-		this.messageData = new HashMap<>();
-	}
-
 	/**
 	 * creates a message object from a string
 	 * 
@@ -36,6 +27,15 @@ public class Message {
 		}
 
 		return newMessage;
+	}
+
+	private HashMap<String, String> messageData;
+
+	/**
+	 * the default constructor
+	 */
+	public Message() {
+		this.messageData = new HashMap<>();
 	}
 
 	/**

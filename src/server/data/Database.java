@@ -58,6 +58,34 @@ public class Database {
 	}
 
 	/**
+	 * check if the cr for a device auth was correct
+	 * 
+	 * @param userName
+	 *            the user's name
+	 * @param device
+	 *            the device
+	 * @param nonce
+	 *            the nonce used for the cr
+	 * @param cr
+	 *            the cr sent by the client
+	 * @return true if the challenge-response was correct
+	 * @throws Exception
+	 */
+	public boolean checkAuthCR(String userName, String device, String nonce, String cr) throws Exception {
+		synchronized (this.users) {
+			if (!Misc.ALLOW_PERMANENT_DEVICES) {
+				return false;
+			}
+			String sCR = this.users.get(userName).createAuthCR(device, nonce);
+			if (sCR == null) {
+				return false;
+			}
+
+			return sCR.equals(cr);
+		}
+	}
+
+	/**
 	 * checks if a cr for the user login is correct
 	 * 
 	 * @param user
@@ -105,33 +133,6 @@ public class Database {
 	}
 
 	/**
-	 * gets the user's email address
-	 * 
-	 * @param username
-	 *            the user's name
-	 * @return the email address
-	 */
-	public String getUserMail(String username) {
-		synchronized (this.users) {
-			return this.users.get(username).getEmail();
-		}
-	}
-
-	/**
-	 * registers a device for a user
-	 * 
-	 * @param username
-	 *            the user's name
-	 * @param deviceCode
-	 *            the device code
-	 */
-	public void registerDevice(String username, String deviceCode) {
-		synchronized (this.users) {
-			this.users.get(username).addDevice(deviceCode);
-		}
-	}
-
-	/**
 	 * delete a user's device
 	 * 
 	 * @param username
@@ -142,34 +143,6 @@ public class Database {
 	public void deleteDevice(String username, String deviceCode) {
 		synchronized (this.users) {
 			this.users.get(username).removeDevice(deviceCode);
-		}
-	}
-
-	/**
-	 * check if the cr for a device auth was correct
-	 * 
-	 * @param userName
-	 *            the user's name
-	 * @param device
-	 *            the device
-	 * @param nonce
-	 *            the nonce used for the cr
-	 * @param cr
-	 *            the cr sent by the client
-	 * @return true if the challenge-response was correct
-	 * @throws Exception
-	 */
-	public boolean checkAuthCR(String userName, String device, String nonce, String cr) throws Exception {
-		synchronized (this.users) {
-			if (!Misc.ALLOW_PERMANENT_DEVICES) {
-				return false;
-			}
-			String sCR = this.users.get(userName).createAuthCR(device, nonce);
-			if (sCR == null) {
-				return false;
-			}
-
-			return sCR.equals(cr);
 		}
 	}
 
@@ -194,6 +167,33 @@ public class Database {
 			this.users.get(receiver).changeMoney(userName, amount);
 
 			return true;
+		}
+	}
+
+	/**
+	 * gets the user's email address
+	 * 
+	 * @param username
+	 *            the user's name
+	 * @return the email address
+	 */
+	public String getUserMail(String username) {
+		synchronized (this.users) {
+			return this.users.get(username).getEmail();
+		}
+	}
+
+	/**
+	 * registers a device for a user
+	 * 
+	 * @param username
+	 *            the user's name
+	 * @param deviceCode
+	 *            the device code
+	 */
+	public void registerDevice(String username, String deviceCode) {
+		synchronized (this.users) {
+			this.users.get(username).addDevice(deviceCode);
 		}
 	}
 

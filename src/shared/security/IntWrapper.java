@@ -26,13 +26,13 @@ public class IntWrapper {
 	}
 
 	/**
-	 * set the value
+	 * adds a value to the object's value
 	 * 
-	 * @param value
-	 *            the new value
+	 * @param val
+	 *            the value to add
 	 */
-	public void set(int value) {
-		this.value = value;
+	public void add(int val) {
+		this.value += val;
 	}
 
 	/**
@@ -45,13 +45,13 @@ public class IntWrapper {
 	}
 
 	/**
-	 * adds a value to the object's value
+	 * set the value
 	 * 
-	 * @param val
-	 *            the value to add
+	 * @param value
+	 *            the new value
 	 */
-	public void add(int val) {
-		this.value += val;
+	public void set(int value) {
+		this.value = value;
 	}
 
 	/**

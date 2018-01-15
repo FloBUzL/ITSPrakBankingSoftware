@@ -29,17 +29,6 @@ public class ClientLoginWorker extends ClientWorker {
 
 	@Override
 	/**
-	 * sets up the objects needed for key exchange
-	 */
-	public Worker setup() {
-		this.dh = new DiffieHellboy();
-		this.hex = new Hex("sorrybutthatsnosecret");
-
-		return this;
-	}
-
-	@Override
-	/**
 	 * runs the authentication
 	 */
 	public Worker run() throws Exception {
@@ -105,6 +94,17 @@ public class ClientLoginWorker extends ClientWorker {
 			this.connectionData.debug("set username: " + username);
 			this.succeeded = true;
 		}
+
+		return this;
+	}
+
+	@Override
+	/**
+	 * sets up the objects needed for key exchange
+	 */
+	public Worker setup() {
+		this.dh = new DiffieHellboy();
+		this.hex = new Hex("sorrybutthatsnosecret");
 
 		return this;
 	}

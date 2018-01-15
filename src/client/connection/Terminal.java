@@ -18,6 +18,15 @@ public class Terminal {
 	}
 
 	/**
+	 * reads a string from the stdin
+	 * 
+	 * @return the read string
+	 */
+	public String read() {
+		return this.scanner.nextLine();
+	}
+
+	/**
 	 * writes a string on the stdout
 	 * 
 	 * @param line
@@ -25,14 +34,5 @@ public class Terminal {
 	 */
 	public void write(String line) {
 		System.out.println(line);
-	}
-
-	/**
-	 * reads a string from the stdin
-	 * 
-	 * @return the read string
-	 */
-	public String read() {
-		return this.scanner.nextLine();
 	}
 }

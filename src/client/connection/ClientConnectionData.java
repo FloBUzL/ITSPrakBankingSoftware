@@ -25,13 +25,12 @@ public class ClientConnectionData extends ConnectionData {
 	}
 
 	/**
-	 * sets the aes object
+	 * gets the connection to the server
 	 * 
-	 * @param aes
-	 *            the new aes object
+	 * @return the connection
 	 */
-	public void setAes(AES aes) {
-		this.aes = aes;
+	public Connection getConnection() {
+		return connection;
 	}
 
 	/**
@@ -44,22 +43,22 @@ public class ClientConnectionData extends ConnectionData {
 	}
 
 	/**
-	 * sets the terminal object
+	 * getter for the user's name
 	 * 
-	 * @param terminal
-	 *            the new terminal object
+	 * @return the user's name
 	 */
-	public void setTerminal(Terminal terminal) {
-		this.terminal = terminal;
+	public String getUsername() {
+		return this.username;
 	}
 
 	/**
-	 * gets the connection to the server
+	 * sets the aes object
 	 * 
-	 * @return the connection
+	 * @param aes
+	 *            the new aes object
 	 */
-	public Connection getConnection() {
-		return connection;
+	public void setAes(AES aes) {
+		this.aes = aes;
 	}
 
 	/**
@@ -73,6 +72,16 @@ public class ClientConnectionData extends ConnectionData {
 	}
 
 	/**
+	 * sets the terminal object
+	 * 
+	 * @param terminal
+	 *            the new terminal object
+	 */
+	public void setTerminal(Terminal terminal) {
+		this.terminal = terminal;
+	}
+
+	/**
 	 * sets the user's username
 	 * 
 	 * @param username
@@ -80,14 +89,5 @@ public class ClientConnectionData extends ConnectionData {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	/**
-	 * getter for the user's name
-	 * 
-	 * @return the user's name
-	 */
-	public String getUsername() {
-		return this.username;
 	}
 }

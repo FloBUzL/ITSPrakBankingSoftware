@@ -30,16 +30,6 @@ public class ServerLoginWorker extends ServerWorker {
 
 	@Override
 	/**
-	 * sets up the objects needed for the key exchange
-	 */
-	public Worker setup() {
-		this.hex = new Hex("sorrybutthatsnosecret");
-		this.dh = new DiffieHellboy();
-		return this;
-	}
-
-	@Override
-	/**
 	 * runs the auth process
 	 */
 	public Worker run() throws Exception {
@@ -102,6 +92,16 @@ public class ServerLoginWorker extends ServerWorker {
 
 		this.connectionData.getConnection().write(loginResponse);
 
+		return this;
+	}
+
+	@Override
+	/**
+	 * sets up the objects needed for the key exchange
+	 */
+	public Worker setup() {
+		this.hex = new Hex("sorrybutthatsnosecret");
+		this.dh = new DiffieHellboy();
 		return this;
 	}
 }

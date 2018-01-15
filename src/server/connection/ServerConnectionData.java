@@ -20,12 +20,10 @@ public class ServerConnectionData extends ConnectionData {
 	private AuthenticationErrors authErrors = null;
 
 	/**
-	 * getterr for the auth-error object
-	 * 
-	 * @return instance of the auth-error object
+	 * sets the user's device to authenticated
 	 */
-	public AuthenticationErrors getAuthErrors() {
-		return authErrors;
+	public void authenticate() {
+		this.isAuthenticated = true;
 	}
 
 	/**
@@ -35,6 +33,51 @@ public class ServerConnectionData extends ConnectionData {
 	 */
 	public AES getAes() {
 		return aes;
+	}
+
+	/**
+	 * getterr for the auth-error object
+	 * 
+	 * @return instance of the auth-error object
+	 */
+	public AuthenticationErrors getAuthErrors() {
+		return authErrors;
+	}
+
+	/**
+	 * getter for the current connection
+	 * 
+	 * @return the current connection
+	 */
+	public Connection getConnection() {
+		return connection;
+	}
+
+	/**
+	 * getter for the database object
+	 * 
+	 * @return the database object
+	 */
+	public Database getDatabase() {
+		return database;
+	}
+
+	/**
+	 * getter for the username
+	 * 
+	 * @return the username
+	 */
+	public String getUserName() {
+		return this.userName;
+	}
+
+	/**
+	 * getter for the auth status of the client's device
+	 * 
+	 * @return true if device is authenticated
+	 */
+	public boolean isAuthenticated() {
+		return this.isAuthenticated;
 	}
 
 	/**
@@ -48,50 +91,13 @@ public class ServerConnectionData extends ConnectionData {
 	}
 
 	/**
-	 * getter for the database object
+	 * setter for the auth-error object
 	 * 
-	 * @return the database object
+	 * @param authErrors
+	 *            the auth-error object
 	 */
-	public Database getDatabase() {
-		return database;
-	}
-
-	/**
-	 * setter for the database object
-	 * 
-	 * @param database
-	 *            new database object
-	 */
-	public void setDatabase(Database database) {
-		this.database = database;
-	}
-
-	/**
-	 * getter for the username
-	 * 
-	 * @return the username
-	 */
-	public String getUserName() {
-		return this.userName;
-	}
-
-	/**
-	 * setter for the username
-	 * 
-	 * @param userName
-	 *            the user's name
-	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	/**
-	 * getter for the current connection
-	 * 
-	 * @return the current connection
-	 */
-	public Connection getConnection() {
-		return connection;
+	public void setAuthErrors(AuthenticationErrors authErrors) {
+		this.authErrors = authErrors;
 	}
 
 	/**
@@ -105,28 +111,22 @@ public class ServerConnectionData extends ConnectionData {
 	}
 
 	/**
-	 * getter for the auth status of the client's device
+	 * setter for the database object
 	 * 
-	 * @return true if device is authenticated
+	 * @param database
+	 *            new database object
 	 */
-	public boolean isAuthenticated() {
-		return this.isAuthenticated;
+	public void setDatabase(Database database) {
+		this.database = database;
 	}
 
 	/**
-	 * sets the user's device to authenticated
-	 */
-	public void authenticate() {
-		this.isAuthenticated = true;
-	}
-
-	/**
-	 * setter for the auth-error object
+	 * setter for the username
 	 * 
-	 * @param authErrors
-	 *            the auth-error object
+	 * @param userName
+	 *            the user's name
 	 */
-	public void setAuthErrors(AuthenticationErrors authErrors) {
-		this.authErrors = authErrors;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }

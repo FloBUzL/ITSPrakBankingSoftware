@@ -35,6 +35,41 @@ public class Connection {
 	}
 
 	/**
+	 * closes the socket
+	 */
+	public void close() {
+		try {
+			this.in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.out.close();
+		try {
+			this.socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * gets the client's ip (probably)
+	 * 
+	 * @return the client's ip
+	 */
+	public String getIP() {
+		return this.socket.getInetAddress().toString();
+	}
+
+	/**
+	 * checks if the socket is closed
+	 * 
+	 * @return true if closed
+	 */
+	public boolean isClosed() {
+		return this.socket.isClosed();
+	}
+
+	/**
 	 * waits for a message
 	 * 
 	 * @return the message received
@@ -58,40 +93,5 @@ public class Connection {
 	public void write(Message msg) {
 		this.out.println(msg);
 		this.out.flush();
-	}
-
-	/**
-	 * gets the client's ip (probably)
-	 * 
-	 * @return the client's ip
-	 */
-	public String getIP() {
-		return this.socket.getInetAddress().toString();
-	}
-
-	/**
-	 * checks if the socket is closed
-	 * 
-	 * @return true if closed
-	 */
-	public boolean isClosed() {
-		return this.socket.isClosed();
-	}
-
-	/**
-	 * closes the socket
-	 */
-	public void close() {
-		try {
-			this.in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		this.out.close();
-		try {
-			this.socket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

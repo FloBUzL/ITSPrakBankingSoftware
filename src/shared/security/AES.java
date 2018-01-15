@@ -27,13 +27,18 @@ public class AES {
 		this.hex = new Hex("heythere!justhangingaround");
 	}
 
-	private Cipher getCipher(boolean decode) throws Exception {
-		Cipher newCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		int opMode = decode ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE;
+	/**
+	 * decodes the given string
+	 * 
+	 * @param encoded
+	 *            string to decode
+	 * @return the decoded string
+	 * @throws Exception
+	 */
+	public String decode(String encoded) throws Exception {
+		Cipher decCipher = this.getCipher(true);
 
-		newCipher.init(opMode, this.aesKey, new IvParameterSpec(this.sharedSecret, 0, 16));
-
-		return newCipher;
+		return new String(decCipher.doFinal(this.hex.fromHex(encoded)));
 	}
 
 	/**
@@ -50,17 +55,12 @@ public class AES {
 		return this.hex.toHex(encCipher.doFinal(raw.getBytes()));
 	}
 
-	/**
-	 * decodes the given string
-	 * 
-	 * @param encoded
-	 *            string to decode
-	 * @return the decoded string
-	 * @throws Exception
-	 */
-	public String decode(String encoded) throws Exception {
-		Cipher decCipher = this.getCipher(true);
+	private Cipher getCipher(boolean decode) throws Exception {
+		Cipher newCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		int opMode = decode ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE;
 
-		return new String(decCipher.doFinal(this.hex.fromHex(encoded)));
+		newCipher.init(opMode, this.aesKey, new IvParameterSpec(this.sharedSecret, 0, 16));
+
+		return newCipher;
 	}
 }

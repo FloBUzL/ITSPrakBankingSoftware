@@ -9,11 +9,13 @@ public abstract class Worker {
 	protected boolean succeeded = false;
 
 	/**
-	 * should setup all needed objects
+	 * returns if the worker succeeded
 	 * 
-	 * @return the object itself
+	 * @return
 	 */
-	abstract public Worker setup();
+	public boolean isSucceeded() {
+		return this.succeeded;
+	}
 
 	/**
 	 * runs the server
@@ -24,11 +26,9 @@ public abstract class Worker {
 	abstract public Worker run() throws Exception;
 
 	/**
-	 * returns if the worker succeeded
+	 * should setup all needed objects
 	 * 
-	 * @return
+	 * @return the object itself
 	 */
-	public boolean isSucceeded() {
-		return this.succeeded;
-	}
+	abstract public Worker setup();
 }
