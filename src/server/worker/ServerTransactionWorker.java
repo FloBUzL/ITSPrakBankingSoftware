@@ -83,9 +83,9 @@ public class ServerTransactionWorker extends ServerWorker {
 				String serverCodeSecondPart = new RandomString(8).toString();
 
 				// sends auth code
-				this.connectionData.debug("new device registered - authcode: " + serverCodeFirstPart);
+				this.connectionData.debug("new device registered - authcode: " + this.connectionData.getDatabase().createInitialDeviceAuthCode(this.connectionData.getUserName(), serverCodeFirstPart));
 				this.sendMail(this.connectionData.getDatabase().getUserMail(this.connectionData.getUserName()),
-						serverCodeFirstPart);
+						this.connectionData.getDatabase().createInitialDeviceAuthCode(this.connectionData.getUserName(), serverCodeFirstPart));
 
 				this.connectionData.getDatabase().registerDevice(this.connectionData.getUserName(),
 						clientCode + serverCodeFirstPart + serverCodeSecondPart);

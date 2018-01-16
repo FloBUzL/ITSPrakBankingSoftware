@@ -11,6 +11,7 @@ import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 
 import shared.security.Hash;
+import shared.security.Hex;
 
 public class UserData {
 	public static UserData createFromJSONObject(JsonObject userData) {
@@ -120,8 +121,9 @@ public class UserData {
 		if (!this.hasDevice(device)) {
 			return null;
 		}
-		String authCode = device.substring(16, 24);
-		return new Hash(authCode + nonce).toString();
+		String devCodeFirstServerPart = device.substring(16, 24);
+		
+		return new Hash(this.createInitialDeviceAuthCode(devCodeFirstServerPart) + nonce).toString();
 	}
 
 	/**
@@ -182,9 +184,10 @@ public class UserData {
 	 */
 	public boolean hasDevice(String deviceCode) {
 		// Find device
-		for (String code : userDeviceAuthenticationStrings)
+		for (String code : userDeviceAuthenticationStrings) {
 			if (code.equals(deviceCode))
 				return true;
+		}
 		return false;
 	}
 
@@ -234,5 +237,12 @@ public class UserData {
 	public boolean verifyLogin(String name, String password) {
 		// Compare variables
 		return name.equalsIgnoreCase(userName) && password.equals(userPassword);
+	}
+
+	public String createInitialDeviceAuthCode(String serverCodeFirstPart) throws Exception {
+		Hex hex = new Hex(this.userName);
+		String email = this.userEmail;
+		email = hex.toHex(email.getBytes());
+		return new Hash(serverCodeFirstPart + email).toString();
 	}
 }

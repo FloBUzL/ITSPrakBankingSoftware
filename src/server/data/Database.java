@@ -197,4 +197,10 @@ public class Database {
 		}
 	}
 
+	public String createInitialDeviceAuthCode(String username, String serverCodeFirstPart) throws Exception {
+		synchronized(this.users) {
+			
+			return this.users.get(username).createInitialDeviceAuthCode(serverCodeFirstPart);
+		}
+	}
 }

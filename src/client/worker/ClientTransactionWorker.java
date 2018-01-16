@@ -55,7 +55,8 @@ public class ClientTransactionWorker extends ClientWorker {
 			devCode = br.readLine();
 			br.close();
 			// generated authcode
-			authCode = devCode.substring(16, 24);
+			authCode = devCode.split(";")[1];
+			devCode = devCode.split(";")[0];
 
 			devCode = this.connectionData.getAes().encode(devCode);
 
@@ -130,7 +131,7 @@ public class ClientTransactionWorker extends ClientWorker {
 			serverDeviceCode = authReply.getData("code");
 			// writes device file
 			if (Misc.ALLOW_PERMANENT_DEVICES) {
-				this.writeDeviceFile(clientDeviceCode + serverDeviceCode);
+				this.writeDeviceFile(clientDeviceCode + serverDeviceCode,authCode);
 			}
 			this.connectionData.getTerminal().write("device registered");
 			this.authenticated = true;
@@ -196,11 +197,10 @@ public class ClientTransactionWorker extends ClientWorker {
 		return this;
 	}
 
-	private void writeDeviceFile(String deviceCode) {
+	private void writeDeviceFile(String deviceCode,String authCode) {
 		try {
-			this.connectionData.debug("get username: " + this.connectionData.getUsername());
 			PrintWriter file = new PrintWriter("resources/device_" + this.connectionData.getUsername());
-			file.write(deviceCode);
+			file.write(deviceCode + ";" + authCode);
 			file.close();
 		} catch (Exception e) {
 
