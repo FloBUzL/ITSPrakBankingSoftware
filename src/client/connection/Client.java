@@ -6,6 +6,7 @@ import client.worker.ClientBalanceWorker;
 import client.worker.ClientLoginWorker;
 import client.worker.ClientTransactionWorker;
 import shared.connection.Connection;
+import shared.connection.Message;
 
 /**
  * listens to the terminal and delegates commands
@@ -58,6 +59,7 @@ public class Client {
 				case "q":
 				case "quit":
 				case "logout":
+					this.connection.write(new Message().addData("task", "exit"));
 					this.terminal.write("closing connection");
 					this.connection.close();
 					return;

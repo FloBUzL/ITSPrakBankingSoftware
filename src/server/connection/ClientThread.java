@@ -63,6 +63,10 @@ public class ClientThread extends Thread {
 				case "transaction":
 					new ServerTransactionWorker(this.connectionData).setup().run();
 					break;
+				case "exit":
+					this.connectionData.getConnection().close();
+					this.connectionData.log("Client logged out");
+					break;
 				case "login":
 				default:
 					throw new NoSuchTaskException(input.getData("task"));
