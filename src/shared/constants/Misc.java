@@ -9,7 +9,7 @@ public class Misc {
 	/**
 	 * if debugging is active
 	 */
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	/**
 	 * if the permanent registering of devices is allowed
 	 */
