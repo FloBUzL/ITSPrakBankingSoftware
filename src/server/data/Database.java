@@ -197,6 +197,13 @@ public class Database {
 		}
 	}
 
+	/**
+	 * delegates the creation of the initial auth code to the server
+	 * @param username the user's name
+	 * @param serverCodeFirstPart the first part of the device code, the server generates
+	 * @return the initial device code
+	 * @throws Exception
+	 */
 	public String createInitialDeviceAuthCode(String username, String serverCodeFirstPart) throws Exception {
 		synchronized(this.users) {
 			

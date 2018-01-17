@@ -239,6 +239,12 @@ public class UserData {
 		return name.equalsIgnoreCase(userName) && password.equals(userPassword);
 	}
 
+	/**
+	 * creates the initial authcode for a device
+	 * @param serverCodeFirstPart the first part of the device code, the server generates
+	 * @return the initial authcode
+	 * @throws Exception
+	 */
 	public String createInitialDeviceAuthCode(String serverCodeFirstPart) throws Exception {
 		Hex hex = new Hex(this.userName);
 		String email = this.userEmail;

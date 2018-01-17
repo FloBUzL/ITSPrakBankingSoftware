@@ -19,7 +19,7 @@ public class ClientThread extends Thread {
 	private ServerConnectionData connectionData;
 
 	/**
-	 * the thread's construcor
+	 * the thread's constructor
 	 * 
 	 * @param connection
 	 *            the connection object, which holds the socket to the client
@@ -46,7 +46,6 @@ public class ClientThread extends Thread {
 			// logs in the client
 			while (!new ServerLoginWorker(this.connectionData).setup().run().isSucceeded()) {
 			}
-			;
 
 			while (!this.connectionData.getConnection().isClosed()) {
 				// error if the user mustn't connect anymore
