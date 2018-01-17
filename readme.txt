@@ -24,3 +24,5 @@ verschlüsselt.
 2.1 Der Auth-Code ist nun kein trivialer Bestandteil des Device-Codes, lässt sich jedoch weiterhin
 deterministisch berechnen
 2.2 Die Authentifizierung geschieht auch hier via Challenge-Response - hash(auth-code + nonce) =: cr
+
+Die run*.sh-Files sind nicht zwangsweise auf jedem System lauffähig
