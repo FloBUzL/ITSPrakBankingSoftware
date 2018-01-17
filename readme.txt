@@ -10,6 +10,10 @@ für eine Weile geblockt. Beides kann in shared.constants.Misc beeinflusst werden
 Die User-ID spielt nun keine Rolle mehr, da diese sich mit einer Änderung der Datenbank schnell
 ändern kann. Dafür ist nun der Benutzername wichtig.
 
+Debugging-Ausgaben werden nun über shared.constants.Misc.DEBUG gesteuert. Ist die Konstante auf
+false gesetzt, werden mit ConnectionData.debug() keine Ausgaben mehr getätigt. (ConnectionData.log()
+tätigt jedoch weiterhin Ausgaben.)
+
 Vorgenommene Änderungen am Protokoll:
 Manche Daten werden nun AES-verschlüsselt übertragen. Meistens handelt es sich dabei um 
 Challenge-Response-Daten. Jedoch werden auch die Balance-Daten sowie der Transaktionsempfänger
